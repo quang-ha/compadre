@@ -3,6 +3,7 @@
 #include "Compadre_GMLS_Basis.hpp"
 #include "Compadre_GMLS_Quadrature.hpp"
 #include "Compadre_GMLS_Targets.hpp"
+// #include "Compadre_Misc.hpp"
 
 namespace Compadre {
 
@@ -178,7 +179,7 @@ void GMLS::generatePolynomialCoefficients(const int number_of_batches) {
 
     global_index_type max_batch_size = (_target_coordinates.extent(0) + TO_GLOBAL(number_of_batches) - 1) / TO_GLOBAL(number_of_batches);
     int RHS_dim[2];
-    getRHSDims(_dense_solver_type, _boundary_type, max_num_rows, this_num_cols, RHS_dims);
+    getRHSDims(_dense_solver_type, _boundary_type, max_num_rows, this_num_cols, RHS_dim);
     try {
         _RHS = Kokkos::View<double*>("RHS", max_batch_size*TO_GLOBAL(RHS_dim[0])*TO_GLOBAL(RHS_dim[1]));
         _P = Kokkos::View<double*>("P", max_batch_size*TO_GLOBAL(max_num_rows)*TO_GLOBAL(this_num_cols));
@@ -317,7 +318,7 @@ void GMLS::generatePolynomialCoefficients(const int number_of_batches) {
                 Kokkos::Profiling::popRegion();
             } else if (_dense_solver_type == DenseSolverType::LU) {
                 Kokkos::Profiling::pushRegion("LU Factorization");
-                GMLS_LinearAlgebra::batchLUFactorize(_RHS.data(), max_num_rows, max_num_rows, _P.data(), this_num_cols, max_num_rows, this_num_cols, this_num_cols, max_num_rows, this_batch_size, _max_num_neighbors, _initial_index_for_batch, _number_of_neighbors_list.data());
+                GMLS_LinearAlgebra::batchLUFactorize(_RHS.data(), RHS_dim[0], RHS_dim[1], _P.data(), this_num_cols, max_num_rows, RHS_dim[0], RHS_dim[1], max_num_rows, this_batch_size, _max_num_neighbors, _initial_index_for_batch, _number_of_neighbors_list.data());
                 Kokkos::Profiling::popRegion();
             } else {
                 Kokkos::Profiling::pushRegion("QR Factorization");
@@ -418,6 +419,9 @@ void GMLS::operator()(const AssembleStandardPsqrtW&, const member_type& teamMemb
     const int this_num_rows = _sampling_multiplier*this->getNNeighbors(target_index);
     const int this_num_cols = _basis_multiplier*_NP;
 
+    int RHS_dim[2];
+    getRHSDims(_dense_solver_type, _boundary_type, max_num_rows, this_num_cols, RHS_dim);
+
     /*
      *    Data
      */
@@ -429,7 +433,7 @@ void GMLS::operator()(const AssembleStandardPsqrtW&, const member_type& teamMemb
     scratch_matrix_right_type PsqrtW(_P.data() 
             + TO_GLOBAL(local_index)*TO_GLOBAL(max_num_rows)*TO_GLOBAL(this_num_cols), max_num_rows, this_num_cols);
     scratch_matrix_right_type RHS(_RHS.data() 
-            + TO_GLOBAL(local_index)*TO_GLOBAL(max_num_rows)*TO_GLOBAL(max_num_rows), max_num_rows, max_num_rows);
+            + TO_GLOBAL(local_index)*TO_GLOBAL(RHS_dim[0])*TO_GLOBAL(RHS_dim[1]), RHS_dim[0], RHS_dim[1]);
     scratch_vector_type w(_w.data() 
             + TO_GLOBAL(local_index)*TO_GLOBAL(max_num_rows), max_num_rows);
 
@@ -445,8 +449,8 @@ void GMLS::operator()(const AssembleStandardPsqrtW&, const member_type& teamMemb
 
     if (_dense_solver_type != DenseSolverType::LU) {
         // fill in RHS with Identity * sqrt(weights)
-        Kokkos::parallel_for(Kokkos::TeamThreadRange(teamMember,this_num_rows), [=] (const int i) {
-            for(int j = 0; j < this_num_rows; ++j) {
+        Kokkos::parallel_for(Kokkos::TeamThreadRange(teamMember,RHS_dim[0]), [=] (const int i) {
+            for(int j = 0; j < RHS_dim[0]; ++j) {
                 RHS(j,i) = (i==j) ? std::sqrt(w(i)) : 0;
             }
         });
@@ -455,7 +459,7 @@ void GMLS::operator()(const AssembleStandardPsqrtW&, const member_type& teamMemb
         // create global memory for matrix M = PsqrtW^T*PsqrtW
         // don't need to cast into scratch_matrix_left_type since the matrix is symmetric
         scratch_matrix_right_type M(_RHS.data()
-            + TO_GLOBAL(local_index)*TO_GLOBAL(max_num_rows)*TO_GLOBAL(max_num_rows), max_num_rows, max_num_rows);
+            + TO_GLOBAL(local_index)*TO_GLOBAL(RHS_dim[0])*TO_GLOBAL(RHS_dim[1]), RHS_dim[0], RHS_dim[1]);
         GMLS_LinearAlgebra::createM(teamMember, M, PsqrtW, this_num_cols /* # of columns */, max_num_rows);
 
         // Need to transpose the PsqrtW for LU solver

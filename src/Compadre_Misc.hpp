@@ -1,6 +1,8 @@
 #ifndef _COMPADRE_MISC_HPP_
 #define _COMPADRE_MISC_HPP_
 
+#include "Compadre_Operators.hpp"
+
 namespace Compadre {
 
 struct XYZ {
@@ -39,13 +41,13 @@ struct XYZ {
 
 KOKKOS_INLINE_FUNCTION
 void getRHSDims(DenseSolverType dense_solver_type, BoundaryType boundary_type, const int M, const int N, int* dims) {
-    if (_dense_solver_type != DenseSolverType::LU) {
-        dims[0] = max_num_rows;
-        dims[1] = max_num_rows;
-    } else {
-        dims[0] = this_num_cols;
-        dims[1] = max_num_rows;
-    }
+   if (dense_solver_type != LU) {
+       dims[0] = M;
+       dims[1] = M;
+   } else {
+       dims[0] = N;
+       dims[1] = N;
+   }
 }
 
 }; // Compadre
