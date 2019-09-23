@@ -177,8 +177,10 @@ void GMLS::generatePolynomialCoefficients(const int number_of_batches) {
      */
 
     global_index_type max_batch_size = (_target_coordinates.extent(0) + TO_GLOBAL(number_of_batches) - 1) / TO_GLOBAL(number_of_batches);
+    int RHS_dim[2];
+    getRHSDims(_dense_solver_type, _boundary_type, max_num_rows, this_num_cols, RHS_dims);
     try {
-        _RHS = Kokkos::View<double*>("RHS", max_batch_size*TO_GLOBAL(max_num_rows)*TO_GLOBAL(max_num_rows));
+        _RHS = Kokkos::View<double*>("RHS", max_batch_size*TO_GLOBAL(RHS_dim[0])*TO_GLOBAL(RHS_dim[1]));
         _P = Kokkos::View<double*>("P", max_batch_size*TO_GLOBAL(max_num_rows)*TO_GLOBAL(this_num_cols));
         _w = Kokkos::View<double*>("w", max_batch_size*TO_GLOBAL(max_num_rows));
     } catch (std::exception &e) {

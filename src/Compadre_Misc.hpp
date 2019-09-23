@@ -37,6 +37,17 @@ struct XYZ {
     }
 }; // XYZ
 
+KOKKOS_INLINE_FUNCTION
+void getRHSDims(DenseSolverType dense_solver_type, BoundaryType boundary_type, const int M, const int N, int* dims) {
+    if (_dense_solver_type != DenseSolverType::LU) {
+        dims[0] = max_num_rows;
+        dims[1] = max_num_rows;
+    } else {
+        dims[0] = this_num_cols;
+        dims[1] = max_num_rows;
+    }
+}
+
 }; // Compadre
 
 #endif
