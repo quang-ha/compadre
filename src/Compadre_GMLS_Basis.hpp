@@ -623,16 +623,12 @@ void GMLS::createWeightsAndP(const member_type& teamMember, scratch_vector_type 
 
             if (weight_p) {
                 for (int j = 0; j < storage_size; ++j) {
-                    // stores layout left for CUDA or LAPACK calls later
-                    // no need to convert offsets to global indices because the sum will never be large
                     P(i+my_num_neighbors*d, j) = delta[j] * std::sqrt(w(i+my_num_neighbors*d));
                     compadre_kernel_assert_extreme_debug(delta[j]==delta[j] && "NaN in sqrt(W)*P matrix.");
                 }
 
             } else {
                 for (int j = 0; j < storage_size; ++j) {
-                    // stores layout left for CUDA or LAPACK calls later
-                    // no need to convert offsets to global indices because the sum will never be large
                     P(i+my_num_neighbors*d, j) = delta[j];
 
                     compadre_kernel_assert_extreme_debug(delta[j]==delta[j] && "NaN in P matrix.");
@@ -687,7 +683,6 @@ void GMLS::createWeightsAndPForCurvature(const member_type& teamMember, scratch_
         int storage_size = only_specific_order ? this->getNP(1, dimension)-this->getNP(0, dimension) : this->getNP(_curvature_poly_order, dimension);
 
         for (int j = 0; j < storage_size; ++j) {
-            // stores layout left for CUDA or LAPACK calls later
             P(i, j) = delta[j] * std::sqrt(w(i));
         }
 
