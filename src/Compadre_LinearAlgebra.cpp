@@ -1,9 +1,17 @@
 #include "Compadre_LinearAlgebra_Definitions.hpp"
+#include "Compadre_Functors.hpp"
 
 namespace Compadre{
 namespace GMLS_LinearAlgebra {
 
-void batchQRFactorize(double *P, int lda, int nda, double *RHS, int ldb, int ndb, int M, int N, int NRHS, const int num_matrices, const size_t max_neighbors, const int initial_index_of_batch, int * neighbor_list_sizes) {
+void batchQRFactorize(ParallelManager pm, double *P, int lda, int nda, double *RHS, int ldb, int ndb, int M, int N, int NRHS, const int num_matrices, const size_t max_neighbors, const int initial_index_of_batch, int * neighbor_list_sizes) {
+
+    ConvertLayoutRightToLeft crl(pm, lda, nda, P);
+    int scratch_size = scratch_matrix_left_type::shmem_size(lda, nda);
+    pm.clearScratchSizes();
+    pm.setTeamScratchSize(1, scratch_size);
+    pm.CallFunctorWithTeamThreads(num_matrices, crl);
+    Kokkos::fence();
 
 #ifdef COMPADRE_USE_CUDA
 
