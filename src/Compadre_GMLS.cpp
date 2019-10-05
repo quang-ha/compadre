@@ -3,6 +3,7 @@
 #include "Compadre_GMLS_Basis.hpp"
 #include "Compadre_GMLS_Quadrature.hpp"
 #include "Compadre_GMLS_Targets.hpp"
+#include "Compadre_Functors.hpp"
 
 namespace Compadre {
 
@@ -233,7 +234,7 @@ void GMLS::generatePolynomialCoefficients(const int number_of_batches) {
 
                 // solves P*sqrt(weights) against sqrt(weights)*Identity, stored in RHS
                 Kokkos::Profiling::pushRegion("Curvature QR Factorization");
-                GMLS_LinearAlgebra::batchQRFactorize(_P.data(), max_num_rows, this_num_cols, _RHS.data(), max_num_rows, max_num_rows, _max_num_neighbors, manifold_NP, _max_num_neighbors, this_batch_size, _max_num_neighbors, _initial_index_for_batch, _number_of_neighbors_list.data());
+                GMLS_LinearAlgebra::batchQRFactorize(_pm, _P.data(), max_num_rows, this_num_cols, _RHS.data(), max_num_rows, max_num_rows, _max_num_neighbors, manifold_NP, _max_num_neighbors, this_batch_size, _max_num_neighbors, _initial_index_for_batch, _number_of_neighbors_list.data());
                 Kokkos::Profiling::popRegion();
 
                 // evaluates targets, applies target evaluation to polynomial coefficients for curvature
@@ -252,7 +253,7 @@ void GMLS::generatePolynomialCoefficients(const int number_of_batches) {
 
             // solves P*sqrt(weights) against sqrt(weights)*Identity, stored in RHS
             Kokkos::Profiling::pushRegion("Curvature QR Factorization");
-            GMLS_LinearAlgebra::batchQRFactorize(_P.data(), max_num_rows, this_num_cols, _RHS.data(), max_num_rows, max_num_rows, _max_num_neighbors, manifold_NP, _max_num_neighbors, this_batch_size, _max_num_neighbors, _initial_index_for_batch, _number_of_neighbors_list.data());
+            GMLS_LinearAlgebra::batchQRFactorize(_pm, _P.data(), max_num_rows, this_num_cols, _RHS.data(), max_num_rows, max_num_rows, _max_num_neighbors, manifold_NP, _max_num_neighbors, this_batch_size, _max_num_neighbors, _initial_index_for_batch, _number_of_neighbors_list.data());
             Kokkos::Profiling::popRegion();
 
             // evaluates targets, applies target evaluation to polynomial coefficients for curvature
@@ -280,7 +281,7 @@ void GMLS::generatePolynomialCoefficients(const int number_of_batches) {
                 Kokkos::Profiling::popRegion();
             } else {
                 Kokkos::Profiling::pushRegion("Manifold QR Factorization");
-                GMLS_LinearAlgebra::batchQRFactorize(_P.data(), max_num_rows, this_num_cols, _RHS.data(), max_num_rows, max_num_rows, max_num_rows, this_num_cols, max_num_rows, this_batch_size, _max_num_neighbors, _initial_index_for_batch, _number_of_neighbors_list.data());
+                GMLS_LinearAlgebra::batchQRFactorize(_pm, _P.data(), max_num_rows, this_num_cols, _RHS.data(), max_num_rows, max_num_rows, max_num_rows, this_num_cols, max_num_rows, this_batch_size, _max_num_neighbors, _initial_index_for_batch, _number_of_neighbors_list.data());
                 Kokkos::Profiling::popRegion();
             }
             Kokkos::fence();
@@ -312,7 +313,7 @@ void GMLS::generatePolynomialCoefficients(const int number_of_batches) {
                 Kokkos::Profiling::popRegion();
             } else {
                 Kokkos::Profiling::pushRegion("QR Factorization");
-                GMLS_LinearAlgebra::batchQRFactorize(_P.data(), max_num_rows, this_num_cols, _RHS.data(), max_num_rows, max_num_rows, max_num_rows, this_num_cols, max_num_rows, this_batch_size, _max_num_neighbors, _initial_index_for_batch, _number_of_neighbors_list.data());
+                GMLS_LinearAlgebra::batchQRFactorize(_pm, _P.data(), max_num_rows, this_num_cols, _RHS.data(), max_num_rows, max_num_rows, max_num_rows, this_num_cols, max_num_rows, this_batch_size, _max_num_neighbors, _initial_index_for_batch, _number_of_neighbors_list.data());
                 Kokkos::Profiling::popRegion();
             }
 
