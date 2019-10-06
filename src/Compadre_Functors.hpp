@@ -14,7 +14,7 @@ struct DefaultTag{
 struct ConvertLayoutRightToLeft {
     int _rows, _cols;
     double* _permanent_mat_ptr;
-    const ParallelManager& _pm;
+    ParallelManager _pm;
 
     // Constructor
     ConvertLayoutRightToLeft(const ParallelManager &pm, int rows, int cols, double* mat_ptr):
