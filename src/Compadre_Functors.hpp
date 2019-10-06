@@ -17,7 +17,6 @@ struct ConvertLayoutRightToLeft {
     const ParallelManager& _pm;
 
     // Constructor
-    KOKKOS_INLINE_FUNCTION
     ConvertLayoutRightToLeft(const ParallelManager &pm, int rows, int cols, double* mat_ptr):
         _pm(pm), _rows(rows), _cols(cols), _permanent_mat_ptr(mat_ptr) {};
 
