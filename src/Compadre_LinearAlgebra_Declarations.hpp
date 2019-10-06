@@ -92,7 +92,7 @@ namespace GMLS_LinearAlgebra {
         \param max_neighbors        [in] - integer for maximum neighbor over all targets
         \param neighbor_list_sizes  [in] - pointer to all neighbor list sizes for each target
     */
-    void batchSVDFactorize(double *P, int lda, int nda, double *RHS, int ldb, int ndb, int M, int N, int NRHS, const int num_matrices, const size_t max_neighbors = 0, const int initial_index_of_batch = 0, int * neighbor_list_sizes = NULL);
+    void batchSVDFactorize(ParallelManager pm, double *P, int lda, int nda, double *RHS, int ldb, int ndb, int M, int N, int NRHS, const int num_matrices, const size_t max_neighbors = 0, const int initial_index_of_batch = 0, int * neighbor_list_sizes = NULL);
 
     /*! \brief Calls LAPACK or CUBLAS to solve a batch of LU problems
 

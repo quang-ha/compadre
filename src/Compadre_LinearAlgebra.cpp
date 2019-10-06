@@ -141,11 +141,18 @@ void batchQRFactorize(ParallelManager pm, double *P, int lda, int nda, double *R
 
 }
 
-void batchSVDFactorize(double *P, int lda, int nda, double *RHS, int ldb, int ndb, int M, int N, int NRHS, const int num_matrices, const size_t max_neighbors, const int initial_index_of_batch, int * neighbor_list_sizes) {
+void batchSVDFactorize(ParallelManager pm, double *P, int lda, int nda, double *RHS, int ldb, int ndb, int M, int N, int NRHS, const int num_matrices, const size_t max_neighbors, const int initial_index_of_batch, int * neighbor_list_sizes) {
 
 // _U, _S, and _V are stored globally so that they can be used to apply targets in applySVD
 // they are not needed on the CPU, only with CUDA because there is no dgelsd equivalent
 // which is why these arguments are not used on the CPU
+    ConvertLayoutRightToLeft crl(pm, lda, nda, P);
+    int scratch_size = scratch_matrix_left_type::shmem_size(lda, nda);
+    pm.clearScratchSizes();
+    pm.setTeamScratchSize(1, scratch_size);
+    pm.CallFunctorWithTeamThreads(num_matrices, crl);
+    Kokkos::fence();
+
 
 #ifdef COMPADRE_USE_CUDA
 
