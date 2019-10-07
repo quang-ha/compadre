@@ -179,7 +179,7 @@ void GMLS::generatePolynomialCoefficients(const int number_of_batches) {
     _pm.setTeamScratchSize(1, team_scratch_size_b);
     _pm.setThreadScratchSize(0, thread_scratch_size_a);
     _pm.setThreadScratchSize(1, thread_scratch_size_b);
-
+    std::cout << "Scratch size " << _pm.getTeamScratchSize(0) << " " << _pm.getTeamScratchSize(1) << " " << _pm.getThreadScratchSize(0) << " " << _pm.getThreadScratchSize(1) << std::endl;
     /*
      *    Allocate Global Device Storage of Data Needed Over Multiple Calls
      */
@@ -682,6 +682,7 @@ void GMLS::operator()(const GetAccurateTangentDirections&, const member_type& te
                     talpha_ij += P_target_row(offset,l)*Q(i,l);
                 });
             }, alpha_ij);
+            teamMember.team_barrier();
             Kokkos::single(Kokkos::PerTeam(teamMember), [&] () {
                 manifold_gradient(i*(_dimensions-1) + k) = alpha_ij; // stored staggered, grad_xi1, grad_xi2, grad_xi1, grad_xi2, ....
             });
@@ -878,6 +879,7 @@ void GMLS::operator()(const ApplyCurvatureTargets&, const member_type& teamMembe
                     talpha_ij += P_target_row(offset,l)*Q(i,l);
                 });
             }, alpha_ij);
+            teamMember.team_barrier();
             Kokkos::single(Kokkos::PerTeam(teamMember), [&] () {
                 manifold_gradient(i*(_dimensions-1) + k) = alpha_ij; // stored staggered, grad_xi1, grad_xi2, grad_xi1, grad_xi2, ....
             });
