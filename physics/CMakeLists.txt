@@ -15,6 +15,9 @@ set(Physics_HEADERS
   Compadre_GMLS_Stokes_Operator.hpp
   Compadre_GMLS_Stokes_BoundaryConditions.hpp
   Compadre_GMLS_Stokes_Sources.hpp
+  Compadre_GMLS_PoissonPureNeumann_Operator.hpp
+  Compadre_GMLS_PoissonPureNeumann_BoundaryConditions.hpp
+  Compadre_GMLS_PoissonPureNeumann_Sources.hpp
   Compadre_LagrangianShallowWater_BoundaryConditions.hpp
   Compadre_LagrangianShallowWater_Operator.hpp
   Compadre_LagrangianShallowWater_Sources.hpp
@@ -47,6 +50,9 @@ set(Physics_SOURCES
   Compadre_GMLS_Stokes_Operator.cpp
   Compadre_GMLS_Stokes_BoundaryConditions.cpp
   Compadre_GMLS_Stokes_Sources.cpp
+  Compadre_GMLS_PoissonPureNeumann_Operator.cpp
+  Compadre_GMLS_PoissonPureNeumann_BoundaryConditions.cpp
+  Compadre_GMLS_PoissonPureNeumann_Sources.cpp
   Compadre_LagrangianShallowWater_BoundaryConditions.cpp
   Compadre_LagrangianShallowWater_Operator.cpp
   Compadre_LagrangianShallowWater_Sources.cpp
