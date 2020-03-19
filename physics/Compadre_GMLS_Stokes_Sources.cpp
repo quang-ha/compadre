@@ -18,12 +18,14 @@ typedef Compadre::XyzVector xyz_type;
 typedef Compadre::NeighborhoodT neighborhood_type;
 
 void GMLS_StokesSources::evaluateRHS(local_index_type field_one, local_index_type field_two, scalar_type time) {
-    Teuchos::RCP<Compadre::AnalyticFunction> velocity_function, pressure_function;
+    Teuchos::RCP<Compadre::AnalyticFunction> velocity_function, velocity_true_function, pressure_function;
     if (_parameters->get<std::string>("solution type")=="sine") {
         velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlSineTestRHS));
+        velocity_true_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlSineTest));
         pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::SineProducts));
     } else {
         velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlPolyTestRHS));
+        velocity_true_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlPolyTest));
         pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::SecondOrderBasis));
     }
 
@@ -81,6 +83,26 @@ void GMLS_StokesSources::evaluateRHS(local_index_type field_one, local_index_typ
                     + force_term.z*_physics->_pressure_neumann_GMLS->getTangentBundle(i, 2, 2);
                 // Now move the constraint term to the RHS
                 rhs_vals(dof, 0) = rhs_vals(dof, 0) - b_i*g;
+
+                // Using the alpha to evaluate the curl curl coming from the exact velocity
+                scalar_type curlcurl_fdotn_target_value = 0.0;
+                for (local_index_type l=0; l<num_neighbors; l++) {
+                    scalar_type curlcurl_fdotn_neighbor_value = 0.0;
+                    for (local_index_type n=0; n<3; n++) {
+                        scalar_type collapse_value = 0.0;
+                        for (local_index_type m=0; m<3; m++) {
+                            // Obtain the normal direction
+                            scalar_type normal_comp = _physics->_pressure_neumann_GMLS->getTangentBundle(i, 2, m);
+                            collapse_value = normal_comp*_physics->_velocity_all_GMLS->getAlpha1TensorTo1Tensor(TargetOperation::CurlCurlOfVectorPointEvaluation, boundary_filtered_flags(i), m /* output component */, l, n /* input component */);
+                        }
+                        // Get neighbor pt
+                        xyz_type neighbor_pt(pts(l, 0), pts(l, 1), pts(l, 2));
+                        curlcurl_fdotn_neighbor_value += collapse_value*velocity_true_function->evalVector(neighbor_pt)[n];
+                    }
+                    curlcurl_fdotn_target_value += curlcurl_fdotn_neighbor_value;
+                }
+                // Move the constraint term to the RHS
+                rhs_vals(dof, 0) = rhs_vals(dof, 0) + b_i*curlcurl_fdotn_target_value;
             }
         }
     }
