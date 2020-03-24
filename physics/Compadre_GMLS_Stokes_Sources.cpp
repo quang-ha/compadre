@@ -93,7 +93,7 @@ void GMLS_StokesSources::evaluateRHS(local_index_type field_one, local_index_typ
                         for (local_index_type m=0; m<3; m++) {
                             // Obtain the normal direction
                             scalar_type normal_comp = _physics->_pressure_neumann_GMLS->getTangentBundle(i, 2, m);
-                            collapse_value = normal_comp*_physics->_velocity_all_GMLS->getAlpha1TensorTo1Tensor(TargetOperation::CurlCurlOfVectorPointEvaluation, boundary_filtered_flags(i), m /* output component */, l, n /* input component */);
+                            collapse_value += normal_comp*_physics->_velocity_all_GMLS->getAlpha1TensorTo1Tensor(TargetOperation::CurlCurlOfVectorPointEvaluation, boundary_filtered_flags(i), m /* output component */, l, n /* input component */);
                         }
                         // Get neighbor pt
                         xyz_type neighbor_pt(pts(l, 0), pts(l, 1), pts(l, 2));
@@ -102,7 +102,7 @@ void GMLS_StokesSources::evaluateRHS(local_index_type field_one, local_index_typ
                     curlcurl_fdotn_target_value += curlcurl_fdotn_neighbor_value;
                 }
                 // Move the constraint term to the RHS
-                rhs_vals(dof, 0) = rhs_vals(dof, 0) + b_i*curlcurl_fdotn_target_value;
+                rhs_vals(dof, 0) = rhs_vals(dof, 0) - b_i*curlcurl_fdotn_target_value;
             }
         }
     }
