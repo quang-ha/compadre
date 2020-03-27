@@ -100,7 +100,6 @@ void GMLS_StokesSources::evaluateRHS(local_index_type field_one, local_index_typ
                         // Get neighbor pt
                         local_index_type neighbor_idx = neighborhood->getNeighbor(boundary_filtered_flags(i), l);
                         xyz_type neighbor_pt = source_coords->getLocalCoords(neighbor_idx, true /*include halo*/, true /*use physical coords*/);
-                        std::cout << "neighbor pts " << neighbor_pt.x << " " << neighbor_pt.y << " " << neighbor_pt.z << std::endl;
                         curlcurl_fdotn_neighbor_value += collapse_value*velocity_true_function->evalVector(neighbor_pt)[n];
                     }
                     curlcurl_fdotn_target_value += curlcurl_fdotn_neighbor_value;
