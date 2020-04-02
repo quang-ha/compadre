@@ -1,7 +1,7 @@
 %YAML 1.1
 ---
 Compadre:
-  'solution type': 'poly'
+  'solution type': 'sine'
   'loop size': 1
   'io':
     # source file for coords and normal vectors
@@ -18,8 +18,8 @@ Compadre:
     'file': '../test_data/parameter_lists/gmls_stokes/solver_amg.xml'
     'blocked': true
   'remap':
-    'weighting power': 2
-    'porder': 2
+    'weighting power': 4
+    'porder': 1
     'quadrature order': 2
     'quadrature dimension': 1
     'quadrature type': 'line'
@@ -27,9 +27,9 @@ Compadre:
   'neighborhood':
     'method': nanoflann
     'search type': radius
-    'size': 0.727272
+    'size': 1.0
     'uniform radii': true
   'halo':
     'dynamic': true
-    'multiplier': 8.0
+    'multiplier': 12.0
 ...
