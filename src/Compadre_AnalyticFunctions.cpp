@@ -327,8 +327,8 @@ xyz_type CurlCurlPolyTestRHS::evalVector(const xyz_type& xyzIn) const {
 }
 
 xyz_type CurlCurlPolyTest::evalVector(const xyz_type& xyzIn) const {
-    return xyz_type(2.0*xyzIn.x + xyzIn.y + xyzIn.z + xyzIn.x*xyzIn.x + xyzIn.y*xyzIn.y + xyzIn.z*xyzIn.z - xyzIn.x*xyzIn.y + xyzIn.y*xyzIn.z - 2.0*xyzIn.x*xyzIn.z + 1.0,
-                    xyzIn.x - xyzIn.y + xyzIn.z + xyzIn.x*xyzIn.x + xyzIn.y*xyzIn.y + xyzIn.z*xyzIn.z - xyzIn.x*xyzIn.y + xyzIn.x*xyzIn.z + 1.0,
+    return xyz_type(2.0*xyzIn.x + xyzIn.y + xyzIn.z + xyzIn.x*xyzIn.x + xyzIn.y*xyzIn.y + xyzIn.z*xyzIn.z - xyzIn.x*xyzIn.y + xyzIn.y*xyzIn.z - xyzIn.x*xyzIn.z + 1.0,
+                    xyzIn.x - xyzIn.y + xyzIn.z + xyzIn.x*xyzIn.x + xyzIn.y*xyzIn.y + xyzIn.z*xyzIn.z - xyzIn.x*xyzIn.y + xyzIn.x*xyzIn.z - xyzIn.y*xyzIn.z + 1.0,
                     xyzIn.x + xyzIn.y - xyzIn.z + xyzIn.x*xyzIn.x + xyzIn.y*xyzIn.y + xyzIn.z*xyzIn.z + xyzIn.x*xyzIn.y - xyzIn.y*xyzIn.z - xyzIn.x*xyzIn.z + 1.0);
 }
 
