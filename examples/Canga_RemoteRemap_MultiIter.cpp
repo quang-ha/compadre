@@ -186,7 +186,7 @@ int main (int argc, char* args[]) {
             if (initial_step_to_compute==1) {
                 testfilename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("input file prefix") + parameters->get<Teuchos::ParameterList>("io").get<std::string>("input file");
             } else {
-                testfilename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + "backward_" + std::to_string(initial_step_to_compute-1) + ".pvtp";
+                testfilename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + "backward_" + std::to_string(initial_step_to_compute-1) + ".nc";
             }
             fm.setReader(testfilename, particles);
             fm.getReader()->setCoordinateLayout(parameters->get<Teuchos::ParameterList>("io").get<std::string>("particles number dimension name"),
@@ -242,12 +242,18 @@ int main (int argc, char* args[]) {
                 particles->getFieldManager()->createField(1,"exact CloudFraction","m^2/1a");
                 particles->getFieldManager()->createField(1,"exact TotalPrecipWater","m^2/1a");
                 particles->getFieldManager()->createField(1,"exact Topography","m^2/1a");
+                particles->getFieldManager()->createField(1,"exact AnalyticalFun1","m^2/1a");
+                particles->getFieldManager()->createField(1,"exact AnalyticalFun2","m^2/1a");
                 Kokkos::deep_copy(particles->getFieldManager()->getFieldByName("exact CloudFraction")->getMultiVectorPtrConst()->getLocalView<Compadre::host_view_type>(),
                     particles->getFieldManager()->getFieldByName("CloudFraction")->getMultiVectorPtrConst()->getLocalView<Compadre::host_view_type>());
                 Kokkos::deep_copy(particles->getFieldManager()->getFieldByName("exact TotalPrecipWater")->getMultiVectorPtrConst()->getLocalView<Compadre::host_view_type>(),
                     particles->getFieldManager()->getFieldByName("TotalPrecipWater")->getMultiVectorPtrConst()->getLocalView<Compadre::host_view_type>());
                 Kokkos::deep_copy(particles->getFieldManager()->getFieldByName("exact Topography")->getMultiVectorPtrConst()->getLocalView<Compadre::host_view_type>(),
                     particles->getFieldManager()->getFieldByName("Topography")->getMultiVectorPtrConst()->getLocalView<Compadre::host_view_type>());
+                Kokkos::deep_copy(particles->getFieldManager()->getFieldByName("exact AnalyticalFun1")->getMultiVectorPtrConst()->getLocalView<Compadre::host_view_type>(),
+                    particles->getFieldManager()->getFieldByName("AnalyticalFun1")->getMultiVectorPtrConst()->getLocalView<Compadre::host_view_type>());
+                Kokkos::deep_copy(particles->getFieldManager()->getFieldByName("exact AnalyticalFun2")->getMultiVectorPtrConst()->getLocalView<Compadre::host_view_type>(),
+                    particles->getFieldManager()->getFieldByName("AnalyticalFun2")->getMultiVectorPtrConst()->getLocalView<Compadre::host_view_type>());
                 if (my_coloring == 25) {
 			        particles->getFieldManager()->createField(1,"exact Smooth","m^2/1a");
 			        particles->getFieldManager()->getFieldByName("exact Smooth")->
@@ -320,6 +326,15 @@ int main (int argc, char* args[]) {
                         Compadre::OptimizationObject opt_obj_2 = Compadre::OptimizationObject(parameters->get<Teuchos::ParameterList>("remap").get<std::string>("optimization algorithm"), true /*single linear bound*/, true /*bounds preservation*/, -1.0e+15, 1.0e+15);
                         r2.setOptimizationObject(opt_obj_2);
                         remap_vec.push_back(r2);
+
+                        Compadre::RemapObject r3("AnalyticalFun1", "AnalyticalFun1", TargetOperation::ScalarFaceAverageEvaluation, ReconstructionSpace::ScalarTaylorPolynomial, ScalarFaceAverageSample, PointSample);
+                        r3.setSourceExtraData(extra_data_name);
+                        remap_vec.push_back(r3);
+
+                        Compadre::RemapObject r4("AnalyticalFun2", "AnalyticalFun2", TargetOperation::ScalarFaceAverageEvaluation, ReconstructionSpace::ScalarTaylorPolynomial, ScalarFaceAverageSample, PointSample);
+                        r4.setSourceExtraData(extra_data_name);
+                        remap_vec.push_back(r4);
+
                     } else {
                         Compadre::RemapObject r0("TotalPrecipWater", "TotalPrecipWater", TargetOperation::ScalarPointEvaluation, ReconstructionSpace::ScalarTaylorPolynomial, PointSample);
                         Compadre::OptimizationObject opt_obj_0 = Compadre::OptimizationObject(parameters->get<Teuchos::ParameterList>("remap").get<std::string>("optimization algorithm"), true /*single linear bound*/, true /*bounds preservation*/, 0, 1.0e+15);
@@ -338,6 +353,12 @@ int main (int argc, char* args[]) {
 
                         Compadre::RemapObject r3("Smooth", "Smooth", TargetOperation::ScalarPointEvaluation, ReconstructionSpace::ScalarTaylorPolynomial, PointSample);
                         remap_vec.push_back(r3);
+
+                        Compadre::RemapObject r4("AnalyticalFun1", "AnalyticalFun1", TargetOperation::ScalarPointEvaluation, ReconstructionSpace::ScalarTaylorPolynomial, PointSample);
+                        remap_vec.push_back(r4);
+
+                        Compadre::RemapObject r5("AnalyticalFun2", "AnalyticalFun2", TargetOperation::ScalarPointEvaluation, ReconstructionSpace::ScalarTaylorPolynomial, PointSample);
+                        remap_vec.push_back(r5);
                     }
                 }
 
@@ -345,11 +366,11 @@ int main (int argc, char* args[]) {
                 // data is now on 33
                 if (my_coloring == 33) {
                     WriteTime->start();
-                    std::string output_filename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + "forward_" + std::to_string(i) + ".pvtp";
+                    std::string output_filename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + "forward_" + std::to_string(i) + ".nc";
                     Compadre::FileManager fm2;
                     fm2.setWriter(output_filename, particles);
                     fm2.write();
-                    output_filename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + "forward_" + std::to_string(i) + ".pvtp.g";
+                    output_filename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + "forward_" + std::to_string(i) + ".g";
                     fm2.setWriter(output_filename, particles);
                     fm2.write();
                     WriteTime->stop();
@@ -388,6 +409,15 @@ int main (int argc, char* args[]) {
                         Compadre::OptimizationObject opt_obj_2 = Compadre::OptimizationObject(parameters->get<Teuchos::ParameterList>("remap").get<std::string>("optimization algorithm"), true /*single linear bound*/, true /*bounds preservation*/, -1.0e+15, 1.0e+15);
                         r2.setOptimizationObject(opt_obj_2);
                         remap_vec.push_back(r2);
+
+                        Compadre::RemapObject r3("AnalyticalFun1", "AnalyticalFun1", TargetOperation::ScalarFaceAverageEvaluation, ReconstructionSpace::ScalarTaylorPolynomial, ScalarFaceAverageSample, PointSample);
+                        r3.setSourceExtraData(extra_data_name);
+                        remap_vec.push_back(r3);
+
+                        Compadre::RemapObject r4("AnalyticalFun2", "AnalyticalFun2", TargetOperation::ScalarFaceAverageEvaluation, ReconstructionSpace::ScalarTaylorPolynomial, ScalarFaceAverageSample, PointSample);
+                        r4.setSourceExtraData(extra_data_name);
+                        remap_vec.push_back(r4);
+
                     } else {
                         Compadre::RemapObject r0("TotalPrecipWater", "TotalPrecipWater", TargetOperation::ScalarPointEvaluation, ReconstructionSpace::ScalarTaylorPolynomial, PointSample);
                         Compadre::OptimizationObject opt_obj_0 = Compadre::OptimizationObject(parameters->get<Teuchos::ParameterList>("remap").get<std::string>("optimization algorithm"), true /*single linear bound*/, true /*bounds preservation*/, 0, 1.0e+15);
@@ -406,6 +436,13 @@ int main (int argc, char* args[]) {
 
                         Compadre::RemapObject r3("Smooth", "Smooth", TargetOperation::ScalarPointEvaluation, ReconstructionSpace::ScalarTaylorPolynomial, PointSample);
                         remap_vec.push_back(r3);
+
+                        Compadre::RemapObject r4("AnalyticalFun1", "AnalyticalFun1", TargetOperation::ScalarPointEvaluation, ReconstructionSpace::ScalarTaylorPolynomial, PointSample);
+                        remap_vec.push_back(r4);
+
+                        Compadre::RemapObject r5("AnalyticalFun2", "AnalyticalFun2", TargetOperation::ScalarPointEvaluation, ReconstructionSpace::ScalarTaylorPolynomial, PointSample);
+                        remap_vec.push_back(r5);
+
                     }
                 }
 
@@ -413,11 +450,11 @@ int main (int argc, char* args[]) {
                 // data is now on 25
                 if (my_coloring == 25) {
                     WriteTime->start();
-                    std::string output_filename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + "backward_" + std::to_string(i) + ".pvtp";
+                    std::string output_filename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + "backward_" + std::to_string(i) + ".nc";
                     Compadre::FileManager fm2;
                     fm2.setWriter(output_filename, particles);
                     fm2.write();
-                    output_filename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + "backward_" + std::to_string(i) + ".pvtp.g";
+                    output_filename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + "backward_" + std::to_string(i) + ".g";
                     fm2.setWriter(output_filename, particles);
                     fm2.write();
                     WriteTime->stop();

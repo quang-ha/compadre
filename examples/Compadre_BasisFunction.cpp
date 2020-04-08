@@ -77,7 +77,7 @@ int main (int argc, char* args[]) {
         
 
         // NEED Cell centered data
-        fm.setReader("../test_data/grids/cells.vtk", particles);
+        fm.setReader("../test_data/grids/cells.nc", particles);
         fm.read();
 	    // build halo data
 	    ST halo_size = h_size *
@@ -104,8 +104,8 @@ int main (int argc, char* args[]) {
     		Teuchos::rcp( new Compadre::ParticlesT(parameters, comm));
     //{
     //    //Compadre::FileManager fm;
-    //    //fm.setReader("../test_data/grids/patch.vtk", eval_particles);
-    //    ////fm.setReader("../test_data/grids/cells.vtk", eval_particles);
+    //    //fm.setReader("../test_data/grids/patch.nc", eval_particles);
+    //    ////fm.setReader("../test_data/grids/cells.nc", eval_particles);
     //    //fm.read();
 	//    // build halo data
 	//    ST halo_size = h_size *
@@ -211,7 +211,7 @@ int main (int argc, char* args[]) {
         });
     
         auto epsilons = _neighborhoodInfo->getHSupportSizes()->getLocalView<const host_view_type>();
-        Kokkos::View<double*> kokkos_epsilons("target_coordinates", target_coords->nLocal(), target_coords->nDim());
+        Kokkos::View<double*> kokkos_epsilons("epsilons",target_coords->nLocal());
         Kokkos::View<double*>::HostMirror kokkos_epsilons_host = Kokkos::create_mirror_view(kokkos_epsilons);
         Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(0,target_coords->nLocal()), KOKKOS_LAMBDA(const int i) {
             kokkos_epsilons_host(i) = epsilons(i,0);
@@ -336,7 +336,7 @@ int main (int argc, char* args[]) {
         const host_view_type source_halo_values_holder = src_particles->getFieldManagerConst()->
                 getFieldByName("remapped_basis")->getHaloMultiVectorPtrConst()->getLocalView<const host_view_type>();
     
-        const local_index_type num_local_particles = source_values_holder.dimension_0();
+        const local_index_type num_local_particles = source_values_holder.extent(0);
     
     
         // fill in the source values, adding regular with halo values into a kokkos view
@@ -422,10 +422,10 @@ int main (int argc, char* args[]) {
 
     {
         //Compadre::FileManager fm;
-	    //fm.setWriter("./out.pvtp", particles);
+	    //fm.setWriter("./out.nc", particles);
 	    //fm.write();
         Compadre::FileManager fm;
-	    fm.setWriter("./out.pvtp", eval_particles);
+	    fm.setWriter("./out.nc", eval_particles);
 	    fm.write();
     }
 

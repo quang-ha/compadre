@@ -30,7 +30,7 @@ if (CompadreHarness_TESTS)
   file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/../test_data" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/..")
 endif()
 
-if (CompadreHarness_EXAMPLES AND CompadreHarness_USE_Trilinos)
+if (CompadreHarness_EXAMPLES)
   add_exe_w_compadre(CompadreGMLSStaggeredAnalyticTest Compadre_GMLSStaggeredAnalyticTest.cpp)
   add_exe_w_compadre(CompadreGMLSStaggeredIntegralTest Compadre_GMLSStaggeredIntegralTest.cpp)
   add_exe_w_compadre(CompadreGMLSCurlCurlTest Compadre_GMLSCurlCurlTest.cpp)
@@ -51,7 +51,7 @@ if (CompadreHarness_EXAMPLES AND CompadreHarness_USE_Trilinos)
   add_exe_w_compadre(lagrangianTest.exe Compadre_LagrangianTest.cpp)
   add_exe_w_compadre(remoteRemapTest.exe Compadre_RemoteRemapTest.cpp)
   add_exe_w_compadre(laplaceBeltrami.exe Compadre_LaplaceBeltrami.cpp)
-  add_exe_w_compadre(advectionDiffusion.exe Compadre_AdvectionDiffusion.cpp)
+  add_exe_w_compadre(reactionDiffusion.exe Compadre_ReactionDiffusion.cpp)
   IF(CompadreHarness_CANGA_ENABLED)
     add_exe_w_compadre(cangaTestRemoteRemap.exe Canga_Test_RemoteRemap.cpp)
     add_exe_w_compadre(cangaTestIntercomparison.exe Canga_Test_Intercomparison.cpp)
@@ -91,12 +91,6 @@ if (CompadreHarness_EXAMPLES AND CompadreHarness_USE_Trilinos)
     
     ADD_TEST(NAME GMLSTest4x1amg COMMAND "mpirun" ${OPENMPI_FLAG} "-np" 4 ${CMAKE_CURRENT_BINARY_DIR}/CompadreGMLSTest "--i=${CMAKE_CURRENT_BINARY_DIR}/../test_data/parameter_lists/gmls_laplacian/parameters_amg.xml" "--kokkos-threads=1")
     SET_TESTS_PROPERTIES(GMLSTest4x1amg PROPERTIES LABELS "ConvergenceTest;convergence;GMLS;gmls;four")
-    
-    ADD_TEST(NAME MeshWritePVTU COMMAND "mpirun" ${OPENMPI_FLAG} "-np" 4 ${CMAKE_CURRENT_BINARY_DIR}/CompadreGMLSTest "--i=${CMAKE_CURRENT_BINARY_DIR}/../test_data/parameter_lists/gmls_laplacian/parameters_mesh_pvtu.xml" "--kokkos-threads=2")
-    SET_TESTS_PROPERTIES(MeshWritePVTU PROPERTIES LABELS "UnitTest;unit;mesh;pvtu")
-    
-    ADD_TEST(NAME MeshWritePVTP COMMAND "mpirun" ${OPENMPI_FLAG} "-np" 4 ${CMAKE_CURRENT_BINARY_DIR}/CompadreGMLSTest "--i=${CMAKE_CURRENT_BINARY_DIR}/../test_data/parameter_lists/gmls_laplacian/parameters_mesh_pvtp.xml" "--kokkos-threads=2")
-    SET_TESTS_PROPERTIES(MeshWritePVTP PROPERTIES LABELS "UnitTest;unit;mesh;pvtp")
 
     # GMLS STAGGERED ANALYTIC LAPLACIAN
 
@@ -147,27 +141,19 @@ if (CompadreHarness_EXAMPLES AND CompadreHarness_USE_Trilinos)
 
     # READER TEST
 
-    ADD_TEST(NAME SphReaderTest COMMAND "mpirun" ${OPENMPI_FLAG} "-np" 3 ${CMAKE_CURRENT_BINARY_DIR}/readerTest.exe "${CMAKE_CURRENT_BINARY_DIR}/../test_data/grids/icos_tri_sphere/icosTri_1.vtk" "--kokkos-threads=2")
+    ADD_TEST(NAME SphReaderTest COMMAND "mpirun" ${OPENMPI_FLAG} "-np" 3 ${CMAKE_CURRENT_BINARY_DIR}/readerTest.exe "${CMAKE_CURRENT_BINARY_DIR}/../test_data/grids/icos_tri_sphere/icosTri_1.nc" "--kokkos-threads=2")
     SET_TESTS_PROPERTIES(SphReaderTest PROPERTIES LABELS "UnitTest;unit;Reader" TIMEOUT 60)
 
 
     # PARALLEL READER TEST
 
     # named 2 because the files it will read in were written by two processors
-    ADD_TEST(NAME ParallelReadVTKWriteVTKTest2 COMMAND "mpirun" ${OPENMPI_FLAG} "-np" 4 ${CMAKE_CURRENT_BINARY_DIR}/parallelReader.exe "--i=${CMAKE_CURRENT_SOURCE_DIR}/../test_data/parameter_lists/reader_test/parameters_2_vtk.xml" "--kokkos-threads=1")
-    SET_TESTS_PROPERTIES(ParallelReadVTKWriteVTKTest2 PROPERTIES LABELS "UnitTest;unit;parallel;read;vtk;VTK")
+    ADD_TEST(NAME ParallelReadNETCDFWriteNETCDFTest2 COMMAND "mpirun" ${OPENMPI_FLAG} "-np" 4 ${CMAKE_CURRENT_BINARY_DIR}/parallelReader.exe "--i=${CMAKE_CURRENT_SOURCE_DIR}/../test_data/parameter_lists/reader_test/parameters_2_netcdf.xml" "--kokkos-threads=1")
+    SET_TESTS_PROPERTIES(ParallelReadNETCDFWriteNETCDFTest2 PROPERTIES LABELS "UnitTest;unit;parallel;read;netcdf;Netcdf")
     
     # named 4 because the files it will read in were written by four processors
-    ADD_TEST(NAME ParallelReadVTKWriteVTKTest4 COMMAND "mpirun" ${OPENMPI_FLAG} "-np" 2 ${CMAKE_CURRENT_BINARY_DIR}/parallelReader.exe "--i=${CMAKE_CURRENT_SOURCE_DIR}/../test_data/parameter_lists/reader_test/parameters_4_vtk.xml" "--kokkos-threads=2")
-    SET_TESTS_PROPERTIES(ParallelReadVTKWriteVTKTest4 PROPERTIES LABELS "UnitTest;unit;parallel;read;vtk;VTK")
-    
-    # named 2 because the files it will read in were written by two processors
-    ADD_TEST(NAME ParallelReadVTKWriteNETCDFTest2 COMMAND "mpirun" ${OPENMPI_FLAG} "-np" 4 ${CMAKE_CURRENT_BINARY_DIR}/parallelReader.exe "--i=${CMAKE_CURRENT_SOURCE_DIR}/../test_data/parameter_lists/reader_test/parameters_2_netcdf.xml" "--kokkos-threads=1")
-    SET_TESTS_PROPERTIES(ParallelReadVTKWriteNETCDFTest2 PROPERTIES LABELS "UnitTest;unit;parallel;read;vtk;VTK;netcdf;Netcdf")
-    
-    # named 4 because the files it will read in were written by four processors
-    ADD_TEST(NAME ParallelReadVTKWriteNETCDFTest4 COMMAND "mpirun" ${OPENMPI_FLAG} "-np" 2 ${CMAKE_CURRENT_BINARY_DIR}/parallelReader.exe "--i=${CMAKE_CURRENT_SOURCE_DIR}/../test_data/parameter_lists/reader_test/parameters_4_netcdf.xml" "--kokkos-threads=2")
-    SET_TESTS_PROPERTIES(ParallelReadVTKWriteNETCDFTest4 PROPERTIES LABELS "UnitTest;unit;parallel;read;vtk;VTK;netcdf;Netcdf")
+    ADD_TEST(NAME ParallelReadNETCDFWriteNETCDFTest4 COMMAND "mpirun" ${OPENMPI_FLAG} "-np" 2 ${CMAKE_CURRENT_BINARY_DIR}/parallelReader.exe "--i=${CMAKE_CURRENT_SOURCE_DIR}/../test_data/parameter_lists/reader_test/parameters_4_netcdf.xml" "--kokkos-threads=2")
+    SET_TESTS_PROPERTIES(ParallelReadNETCDFWriteNETCDFTest4 PROPERTIES LABELS "UnitTest;unit;parallel;read;netcdf;Netcdf")
 
 
     # COORDS TEST
@@ -247,14 +233,14 @@ if (CompadreHarness_EXAMPLES AND CompadreHarness_USE_Trilinos)
 
     # ADVECTION DIFFUSION TESTS
     
-    ADD_TEST(NAME L2ProjectionTest COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../test_data/utilities/advectiondiffusion_convergence.py" "2" "1" "1" "0") # 4 polynomial order, 2 successive meshes, 1 l2 projection only, 0 - polynomial solution
-    SET_TESTS_PROPERTIES(L2ProjectionTest PROPERTIES LABELS "advection;diffusion;dg;variational;weakform;l2")
+    #ADD_TEST(NAME L2ProjectionTest COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../test_data/utilities/advectiondiffusion_convergence.py" "2" "1" "1" "0") # 4 polynomial order, 2 successive meshes, 1 l2 projection only, 0 - polynomial solution
+    #SET_TESTS_PROPERTIES(L2ProjectionTest PROPERTIES LABELS "advection;diffusion;dg;variational;weakform;l2")
 
-    ADD_TEST(NAME L2ProjectionTestConv COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../test_data/utilities/advectiondiffusion_convergence.py" "2" "2" "1" "1") # 4 polynomial order, 2 successive meshes, 1 l2 projection only, 0 - polynomial solution
-    SET_TESTS_PROPERTIES(L2ProjectionTestConv PROPERTIES LABELS "advection;diffusion;dg;variational;weakform;l2")
+    #ADD_TEST(NAME L2ProjectionTestConv COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../test_data/utilities/advectiondiffusion_convergence.py" "2" "2" "1" "1") # 4 polynomial order, 2 successive meshes, 1 l2 projection only, 0 - polynomial solution
+    #SET_TESTS_PROPERTIES(L2ProjectionTestConv PROPERTIES LABELS "advection;diffusion;dg;variational;weakform;l2")
 
-    #ADD_TEST(NAME AdvectionDiffusionTestConv COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../test_data/utilities/advectiondiffusion_convergence.py" "2" "3" "0" "1") # 4 polynomial order, 2 successive meshes, 1 l2 projection only, 0 - polynomial solution
-    #SET_TESTS_PROPERTIES(AdvectionDiffusionTestConv PROPERTIES LABELS "advection;diffusion;dg;variational;weakform;")
+    #ADD_TEST(NAME ReactionDiffusionTestConv COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../test_data/utilities/reactiondiffusion_convergence.py" "2" "3" "0" "1") # 4 polynomial order, 2 successive meshes, 1 l2 projection only, 0 - polynomial solution
+    #SET_TESTS_PROPERTIES(ReactionDiffusionTestConv PROPERTIES LABELS "reaction;diffusion;dg;variational;weakform;")
     
     # CANGA TESTS
     
@@ -274,6 +260,47 @@ if (CompadreHarness_EXAMPLES AND CompadreHarness_USE_Trilinos)
         SET_TESTS_PROPERTIES(CangaTestIntercomparison PROPERTIES LABELS "Canga;canga;comparison;compare")
     ENDIF()
     
+    IF (CompadreHarness_REBAR_ENABLED)
+        
+        # L2 projection
+        ADD_TEST(NAME REBAR_L2_Exact_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=l2" "--solution=polynomial_2" "--num-meshes=1" "--penalty=1.0" "--order=2" "--size=1.0" "--convergence-type=exact" "--rate-tol=1e-11")
+        SET_TESTS_PROPERTIES(REBAR_L2_Exact_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+        ADD_TEST(NAME REBAR_L2_Convergence_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=l2" "--solution=sine" "--num-meshes=3" "--penalty=1.0" "--order=4" "--size=1.0")
+        SET_TESTS_PROPERTIES(REBAR_L2_Convergence_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+
+        # Reaction Diffusion
+        ADD_TEST(NAME REBAR_RD_Exact_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=rd" "--solution=polynomial_2" "--num-meshes=1" "--penalty=1.0" "--order=2" "--size=1.0" "--convergence-type=exact" "--rate-tol=1e-10")
+        SET_TESTS_PROPERTIES(REBAR_RD_Exact_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+        ADD_TEST(NAME REBAR_RD_Convergence_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=rd" "--solution=sine" "--num-meshes=3" "--penalty=1.0" "--order=2" "--size=1.0")
+        SET_TESTS_PROPERTIES(REBAR_RD_Convergence_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+
+        # Linear Elasticity
+        ADD_TEST(NAME REBAR_LE_Exact_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=le" "--solution=polynomial_2" "--num-meshes=1" "--order=2" "--size=1.0" "--convergence-type=exact" "--rate-tol=1e-11" "--penalty=100.0")
+        SET_TESTS_PROPERTIES(REBAR_LE_Exact_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+        ADD_TEST(NAME REBAR_LE_Convergence_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=le" "--solution=sine" "--num-meshes=4" "--order=2" "--size=1.0" "--penalty=100.0")
+        SET_TESTS_PROPERTIES(REBAR_LE_Convergence_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+
+        # Vector Laplacian
+        ADD_TEST(NAME REBAR_VL_Exact_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=vl" "--solution=polynomial_2" "--num-meshes=1" "--order=2" "--size=1.0" "--convergence-type=exact" "--rate-tol=1e-11" "--penalty=100.0")
+        SET_TESTS_PROPERTIES(REBAR_VL_Exact_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+        ADD_TEST(NAME REBAR_VL_Convergence_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=vl" "--solution=sine" "--num-meshes=3" "--order=4" "--size=1.0" "--penalty=100.0")
+        SET_TESTS_PROPERTIES(REBAR_VL_Convergence_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+
+        # Stokes Flow
+        ADD_TEST(NAME REBAR_ST_Exact_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=st" "--solution=divfree_polynomial_2" "--pressure-solution=polynomial_1" "--num-meshes=1" "--order=2" "--size=1.0" "--convergence-type=exact" "--rate-tol=1e-11" "--penalty=10.0")
+        SET_TESTS_PROPERTIES(REBAR_ST_Exact_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+        ADD_TEST(NAME REBAR_ST_Convergence_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=st" "--solution=divfree_sinecos" "--pressure-solution=polynomial_3" "--num-meshes=3" "--order=4" "--size=1.5" "--penalty=10.0")
+        SET_TESTS_PROPERTIES(REBAR_ST_Convergence_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+
+        # Mixed Linear Elasticity
+        ADD_TEST(NAME REBAR_MixLE_DivFree_Exact_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=mix_le" "--solution=divfree_polynomial_2" "--pressure-solution=polynomial_1" "--num-meshes=1" "--order=2" "--size=1.0" "--convergence-type=exact" "--rate-tol=1e-11" "--penalty=100.0")
+        SET_TESTS_PROPERTIES(REBAR_MixLE_DivFree_Exact_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+        ADD_TEST(NAME REBAR_MixLE_Exact_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=mix_le" "--solution=polynomial_2" "--pressure-solution=polynomial_1" "--num-meshes=1" "--order=2" "--size=1.0" "--convergence-type=exact" "--rate-tol=1e-11" "--penalty=100.0")
+        SET_TESTS_PROPERTIES(REBAR_MixLE_Exact_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+        ADD_TEST(NAME REBAR_MixLE_Convergence_Test COMMAND "python" "${CMAKE_CURRENT_BINARY_DIR}/../../test_data/utilities/variational_convergence.py" "--operator=mix_le" "--solution=sine" "--num-meshes=3" "--order=3" "--size=1.5" "--penalty=100.0")
+        SET_TESTS_PROPERTIES(REBAR_MixLE_Convergence_Test PROPERTIES LABELS "rebar;REBAR;Rebar")
+
+    ENDIF()
     
     ## SHALLOW WATER TESTS
     #

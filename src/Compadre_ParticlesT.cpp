@@ -53,7 +53,7 @@ ParticlesT::ParticlesT (Teuchos::RCP<Teuchos::ParameterList> parameters,
 
 void ParticlesT::insertParticles(const std::vector<xyz_type>& new_pts_vector, const scalar_type rebuilt_halo_size,
 		bool repartition, bool inserting_physical_coords, bool repartition_using_physical_coords, bool verify_coords_on_processor) {
-
+	TEUCHOS_TEST_FOR_EXCEPT_MSG(_parameters->get<Teuchos::ParameterList>("io").get<bool>("preserve gids"), "Preservation of global IDs is incompatible with inserting particles.\n");
 	/*
 	 * A few important details on this function.
 	 *
@@ -140,6 +140,8 @@ void ParticlesT::insertParticles(const std::vector<xyz_type>& new_pts_vector, co
 }
 
 void ParticlesT::removeParticles(const std::vector<local_index_type>& coord_ids, const scalar_type rebuilt_halo_size, bool repartition, bool repartition_using_physical_coords) {
+	TEUCHOS_TEST_FOR_EXCEPT_MSG(_parameters->get<Teuchos::ParameterList>("io").get<bool>("preserve gids"), "Preservation of global IDs is incompatible with removing particles.\n");
+
 	std::vector<local_index_type> coord_ids_ordered = coord_ids;
 	std::sort (coord_ids_ordered.begin(), coord_ids_ordered.end());
 
@@ -154,7 +156,7 @@ void ParticlesT::removeParticles(const std::vector<local_index_type>& coord_ids,
 	Teuchos::RCP<mvec_local_index_type> new_flag = Teuchos::rcp(new mvec_local_index_type(_coords->getMapConst(), 1, setToZero));
 	host_view_local_index_type new_bc_id = new_flag->getLocalView<host_view_local_index_type>();
 	host_view_local_index_type old_bc_id = _flag->getLocalView<host_view_local_index_type>();
-	Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(0,old_bc_id.dimension_0()), KOKKOS_LAMBDA(const int i) {
+	Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(0,old_bc_id.extent(0)), KOKKOS_LAMBDA(const int i) {
 		bool deleted = false;
 		local_index_type offset = num_remove_coords;
 		for (local_index_type j=0; j<num_remove_coords; j++) {
@@ -189,6 +191,8 @@ void ParticlesT::removeParticles(const std::vector<local_index_type>& coord_ids,
 }
 
 void ParticlesT::mergeWith(const particles_type* other_particles) {
+	TEUCHOS_TEST_FOR_EXCEPT_MSG(_parameters->get<Teuchos::ParameterList>("io").get<bool>("preserve gids"), "Preservation of global IDs is incompatible with merging particles.\n");
+
 	// we could copy data using Kokkos arrays, but converting to std::vector isn't that expensive and
 	// allows us to reuse the existing interface to CoordsT for inserting points
 	host_view_type other_pts_vals;
@@ -198,12 +202,12 @@ void ParticlesT::mergeWith(const particles_type* other_particles) {
 	if (other_particles->getCoordsConst()->isLagrangian()) {
 		other_pts_vals = other_particles->getCoordsConst()->getPts(false /*halo*/, false)->getLocalView<host_view_type>();
 		other_pts_physical_vals = other_particles->getCoordsConst()->getPts()->getLocalView<host_view_type>();
-		other_pts_physical_num = other_pts_physical_vals.dimension_0();
+		other_pts_physical_num = other_pts_physical_vals.extent(0);
 	} else {
 		other_pts_vals = other_particles->getCoordsConst()->getPts()->getLocalView<host_view_type>();
 		other_pts_physical_vals = other_particles->getCoordsConst()->getPts(false /*halo*/, false)->getLocalView<host_view_type>();
 	}
-	other_pts_num = other_pts_vals.dimension_0();
+	other_pts_num = other_pts_vals.extent(0);
 
 	std::vector<xyz_type> copied_pts(other_pts_num);
 	std::vector<xyz_type> copied_pts_physical;
@@ -230,7 +234,7 @@ void ParticlesT::mergeWith(const particles_type* other_particles) {
 	host_view_local_index_type old_bc_id = _flag->getLocalView<host_view_local_index_type>();
 	host_view_local_index_type other_bc_id = other_particles->getFlags()->getLocalView<host_view_local_index_type>();
 	// copy over old boundary ids
-	const local_index_type old_bc_id_num = (local_index_type)(old_bc_id.dimension_0());
+	const local_index_type old_bc_id_num = (local_index_type)(old_bc_id.extent(0));
 	Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(0,old_bc_id_num), KOKKOS_LAMBDA(const int i) {
 		new_bc_id(i,0) = old_bc_id(i,0);
 	});
@@ -391,7 +395,7 @@ void ParticlesT::setFlag(const local_index_type idx, const local_index_type val)
 	flagView(idx,0) = val;
 }
 
-double ParticlesT::getFlag(const local_index_type idx) const {
+local_index_type ParticlesT::getFlag(const local_index_type idx) const {
 	host_view_local_index_type flagView = _flag->getLocalView<host_view_local_index_type>();
 	return flagView(idx,0);
 }
