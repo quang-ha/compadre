@@ -66,8 +66,8 @@ int main(int argc, char* args[]) {
         std::vector<double> velocity_errors(1);
         std::vector<double> pressure_errors(1);
         const std::string filename_prefix = parameters->get<Teuchos::ParameterList>("io").get<std::string>("input file prefix");
-        fnames[0] = filename_prefix + "12.nc";
-        hsize[0] = 12;
+        fnames[0] = filename_prefix + "6.nc";
+        hsize[0] = 6;
 
         TEUCHOS_TEST_FOR_EXCEPT_MSG(parameters->get<int>("loop size")>3, "Only three mesh levels available for this problem.");
 
@@ -149,6 +149,11 @@ int main(int argc, char* args[]) {
                 SolvingTime->start();
                 problem->solve();
                 SolvingTime->stop();
+
+                // set solution to something different
+                Compadre::CurlCurlSineTest vel_function;
+                particles->getFieldManager()->getFieldByName("velocity")->localInitFromVectorFunction(&vel_function);
+                problem->residual();
             }
 
             Teuchos::RCP<Compadre::AnalyticFunction> velocity_function, pressure_function;
