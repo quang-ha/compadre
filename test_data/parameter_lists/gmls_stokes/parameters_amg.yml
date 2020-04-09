@@ -10,7 +10,7 @@ Compadre:
     # output file location
     'output file prefix': '../test_data/amg_stokes_'
     # data reconstructed on target
-    'output file': '.pvtp'
+    'output file': '.nc'
     # turn off mesh produced by vtk
     'vtk produce mesh': false
   'solver':
