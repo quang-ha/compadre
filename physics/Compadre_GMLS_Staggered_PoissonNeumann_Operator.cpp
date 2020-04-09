@@ -108,11 +108,11 @@ void GMLS_Staggered_PoissonNeumannPhysics::initialize() {
 
     // Extract out points without any BC
     _noconstraint_filtered_flags = filterViewByID<Kokkos::HostSpace>(kokkos_flags_host, 0);
-    auto noconstraint_kokkos_target_coordinates_host = extractViewByIndex<Kokkos::HostSpace>(kokkos_target_coordinates_host,
+    auto noconstraint_kokkos_target_coordinates_host = Extract::extractViewByIndex<Kokkos::HostSpace>(kokkos_target_coordinates_host,
             _noconstraint_filtered_flags);
-    auto noconstraint_kokkos_neighbor_lists_host = extractViewByIndex<Kokkos::HostSpace>(kokkos_neighbor_lists_host,
+    auto noconstraint_kokkos_neighbor_lists_host = Extract::extractViewByIndex<Kokkos::HostSpace>(kokkos_neighbor_lists_host,
             _noconstraint_filtered_flags);
-    auto noconstraint_kokkos_epsilons_host = extractViewByIndex<Kokkos::HostSpace>(kokkos_epsilons_host,
+    auto noconstraint_kokkos_epsilons_host = Extract::extractViewByIndex<Kokkos::HostSpace>(kokkos_epsilons_host,
             _noconstraint_filtered_flags);
 
     // Extract out points labeled with Dirichlet BC
@@ -121,13 +121,13 @@ void GMLS_Staggered_PoissonNeumannPhysics::initialize() {
     // Extract out points labeled with Neumann BC
     // _neuman_filtered_flags belongs to physics class
     _neumann_filtered_flags = filterViewByID<Kokkos::HostSpace>(kokkos_flags_host, 2);
-    auto neumann_kokkos_target_coordinates_host = extractViewByIndex<Kokkos::HostSpace>(kokkos_target_coordinates_host,
+    auto neumann_kokkos_target_coordinates_host = Extract::extractViewByIndex<Kokkos::HostSpace>(kokkos_target_coordinates_host,
             _neumann_filtered_flags);
-    auto neumann_kokkos_neighbor_lists_host = extractViewByIndex<Kokkos::HostSpace>(kokkos_neighbor_lists_host,
+    auto neumann_kokkos_neighbor_lists_host = Extract::extractViewByIndex<Kokkos::HostSpace>(kokkos_neighbor_lists_host,
             _neumann_filtered_flags);
-    auto neumann_kokkos_epsilons_host = extractViewByIndex<Kokkos::HostSpace>(kokkos_epsilons_host,
+    auto neumann_kokkos_epsilons_host = Extract::extractViewByIndex<Kokkos::HostSpace>(kokkos_epsilons_host,
             _neumann_filtered_flags);
-    auto neumann_kokkos_normals_host = extractViewByIndex<Kokkos::HostSpace>(kokkos_normals_host,
+    auto neumann_kokkos_normals_host = Extract::extractViewByIndex<Kokkos::HostSpace>(kokkos_normals_host,
             _neumann_filtered_flags);
 
     // Now create a tangent bundles to set for the points with Neumann BC

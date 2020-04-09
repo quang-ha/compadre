@@ -155,13 +155,13 @@ void GMLS_StokesPhysics::initialize() {
 
     // Extract out points labeled with Neumann BC
     _boundary_filtered_flags = filterViewByID<Kokkos::HostSpace>(kokkos_flags_host, 1);
-    auto boundary_kokkos_target_coordinates_host = extractViewByIndex<Kokkos::HostSpace>(kokkos_target_coordinates_host,
+    auto boundary_kokkos_target_coordinates_host = Extract::extractViewByIndex<Kokkos::HostSpace>(kokkos_target_coordinates_host,
             _boundary_filtered_flags);
-    auto boundary_kokkos_neighbor_lists_host = extractViewByIndex<Kokkos::HostSpace>(kokkos_neighbor_lists_host,
+    auto boundary_kokkos_neighbor_lists_host = Extract::extractViewByIndex<Kokkos::HostSpace>(kokkos_neighbor_lists_host,
             _boundary_filtered_flags);
-    auto boundary_kokkos_epsilons_host = extractViewByIndex<Kokkos::HostSpace>(kokkos_epsilons_host,
+    auto boundary_kokkos_epsilons_host = Extract::extractViewByIndex<Kokkos::HostSpace>(kokkos_epsilons_host,
             _boundary_filtered_flags);
-    auto boundary_kokkos_normals_host = extractViewByIndex<Kokkos::HostSpace>(kokkos_normals_host,
+    auto boundary_kokkos_normals_host = Extract::extractViewByIndex<Kokkos::HostSpace>(kokkos_normals_host,
             _boundary_filtered_flags);
 
     // Now create a tangent bundles to set for the points with boundary BC
