@@ -86,26 +86,26 @@ void GMLS_StokesSources::evaluateRHS(local_index_type field_one, local_index_typ
                 // Now move the constraint term to the RHS
                 rhs_vals(dof, 0) = rhs_vals(dof, 0) - b_i*g;
 
-                // Using the alpha to evaluate the curl curl coming from the exact velocity
-                scalar_type curlcurl_fdotn_target_value = 0.0;
-                for (local_index_type l=0; l<num_neighbors; l++) {
-                    scalar_type curlcurl_fdotn_neighbor_value = 0.0;
-                    for (local_index_type n=0; n<3; n++) {
-                        scalar_type collapse_value = 0.0;
-                        for (local_index_type m=0; m<3; m++) {
-                            // Obtain the normal direction
-                            scalar_type normal_comp = _physics->_pressure_neumann_GMLS->getTangentBundle(i, 2, m);
-                            collapse_value += normal_comp*_physics->_velocity_all_GMLS->getAlpha1TensorTo1Tensor(TargetOperation::CurlCurlOfVectorPointEvaluation, boundary_filtered_flags(i), m /* output component */, l, n /* input component */);
-                        }
-                        // Get neighbor pt
-                        local_index_type neighbor_idx = neighborhood->getNeighbor(boundary_filtered_flags(i), l);
-                        xyz_type neighbor_pt = source_coords->getLocalCoords(neighbor_idx, true /*include halo*/, true /*use physical coords*/);
-                        curlcurl_fdotn_neighbor_value += collapse_value*velocity_true_function->evalVector(neighbor_pt)[n];
-                    }
-                    curlcurl_fdotn_target_value += curlcurl_fdotn_neighbor_value;
-                }
-                // Move the constraint term to the RHS
-                rhs_vals(dof, 0) = rhs_vals(dof, 0) - b_i*curlcurl_fdotn_target_value;
+                // // Using the alpha to evaluate the curl curl coming from the exact velocity
+                // scalar_type curlcurl_fdotn_target_value = 0.0;
+                // for (local_index_type l=0; l<num_neighbors; l++) {
+                //     scalar_type curlcurl_fdotn_neighbor_value = 0.0;
+                //     for (local_index_type n=0; n<3; n++) {
+                //         scalar_type collapse_value = 0.0;
+                //         for (local_index_type m=0; m<3; m++) {
+                //             // Obtain the normal direction
+                //             scalar_type normal_comp = _physics->_pressure_neumann_GMLS->getTangentBundle(i, 2, m);
+                //             collapse_value += normal_comp*_physics->_velocity_all_GMLS->getAlpha1TensorTo1Tensor(TargetOperation::CurlCurlOfVectorPointEvaluation, boundary_filtered_flags(i), m /* output component */, l, n /* input component */);
+                //         }
+                //         // Get neighbor pt
+                //         local_index_type neighbor_idx = neighborhood->getNeighbor(boundary_filtered_flags(i), l);
+                //         xyz_type neighbor_pt = source_coords->getLocalCoords(neighbor_idx, true /*include halo*/, true /*use physical coords*/);
+                //         curlcurl_fdotn_neighbor_value += collapse_value*velocity_true_function->evalVector(neighbor_pt)[n];
+                //     }
+                //     curlcurl_fdotn_target_value += curlcurl_fdotn_neighbor_value;
+                // }
+                // // Move the constraint term to the RHS
+                // rhs_vals(dof, 0) = rhs_vals(dof, 0) - b_i*curlcurl_fdotn_target_value;
             }
         }
     }
