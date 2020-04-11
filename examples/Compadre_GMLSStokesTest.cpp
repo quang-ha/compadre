@@ -3,6 +3,7 @@
 #include <Teuchos_RCP.hpp>
 #include <Tpetra_Core.hpp>
 
+#include <Compadre_GlobalConstants.hpp>
 #include <Kokkos_Core.hpp>
 #include <Compadre_ProblemT.hpp>
 #include <Compadre_ParticlesT.hpp>
@@ -151,8 +152,15 @@ int main(int argc, char* args[]) {
                 SolvingTime->stop();
 
                 // set solution to something different
-                Compadre::CurlCurlSineTest vel_function;
-                particles->getFieldManager()->getFieldByName("velocity")->localInitFromVectorFunction(&vel_function);
+                Compadre::CurlCurlPolyTest v_function;
+                Compadre::SecondOrderBasis p_function;
+                particles->getFieldManager()->getFieldByName("velocity")->localInitFromVectorFunction(&v_function);
+                particles->getFieldManager()->getFieldByName("pressure")->localInitFromScalarFunction(&p_function);
+                auto lm_view = particles->getFieldManager()->getFieldByName("lm_pressure")->getMultiVectorPtr()->getLocalView<Compadre::host_view_type>();
+                for (int jj=0; jj<lm_view.extent(0); ++jj) {
+                    lm_view(jj,0) = 0.0;
+                }
+                particles->getFieldManager()->updateFieldsHaloData();
                 problem->residual();
             }
 
