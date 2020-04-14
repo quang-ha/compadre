@@ -8,7 +8,7 @@ Compadre:
     'input file prefix': '../test_data/grids/cube_with_normals_'
     'input file': ''
     # output file location
-    'output file prefix': '../test_data/stokes_output/amg_stokes_'
+    'output file prefix': '../test_data/amg_stokes_'
     # data reconstructed on target
     'output file': '.nc'
     # turn off mesh produced by vtk
@@ -27,7 +27,7 @@ Compadre:
   'neighborhood':
     'method': nanoflann
     'search type': radius
-    'size': 1.0
+    'size': 1.4
     'uniform radii': true
   'halo':
     'dynamic': true
