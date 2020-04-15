@@ -151,17 +151,17 @@ int main(int argc, char* args[]) {
                 problem->solve();
                 SolvingTime->stop();
 
-                // set solution to something different
-                Compadre::CurlCurlPolyTest v_function;
-                Compadre::SecondOrderBasis p_function;
-                particles->getFieldManager()->getFieldByName("velocity")->localInitFromVectorFunction(&v_function);
-                particles->getFieldManager()->getFieldByName("pressure")->localInitFromScalarFunction(&p_function);
-                auto lm_view = particles->getFieldManager()->getFieldByName("lm_pressure")->getMultiVectorPtr()->getLocalView<Compadre::host_view_type>();
-                for (int jj=0; jj<lm_view.extent(0); ++jj) {
-                    lm_view(jj,0) = 0.0;
-                }
-                particles->getFieldManager()->updateFieldsHaloData();
-                problem->residual();
+                // // compute the residual
+                // Compadre::CurlCurlPolyTest v_function;
+                // Compadre::SecondOrderBasis p_function;
+                // particles->getFieldManager()->getFieldByName("velocity")->localInitFromVectorFunction(&v_function);
+                // particles->getFieldManager()->getFieldByName("pressure")->localInitFromScalarFunction(&p_function);
+                // auto lm_view = particles->getFieldManager()->getFieldByName("lm_pressure")->getMultiVectorPtr()->getLocalView<Compadre::host_view_type>();
+                // for (int jj=0; jj<lm_view.extent(0); ++jj) {
+                //     lm_view(jj,0) = 0.0;
+                // }
+                // particles->getFieldManager()->updateFieldsHaloData();
+                // problem->residual();
             }
 
             Teuchos::RCP<Compadre::AnalyticFunction> velocity_function, pressure_function;
