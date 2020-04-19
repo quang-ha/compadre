@@ -806,15 +806,15 @@ xyz_type CangaSphereTransform::evalVector(const xyz_type& latLonIn) const {
 //
 
 xyz_type CurlCurlSineTestRHS::evalVector(const xyz_type& xyzIn) const {
-    return xyz_type(0.5*sin(0.5*xyzIn.y)*sin(0.5*xyzIn.z),
-                    0.5*sin(0.5*xyzIn.x)*sin(0.5*xyzIn.z),
-                    0.5*sin(0.5*xyzIn.x)*sin(0.5*xyzIn.y));
+    return xyz_type(2.0*sin(xyzIn.y)*sin(xyzIn.z),
+                    2.0*sin(xyzIn.x)*sin(xyzIn.z),
+                    2.0*sin(xyzIn.x)*sin(xyzIn.y));
 }
 
 xyz_type CurlCurlSineTest::evalVector(const xyz_type& xyzIn) const {
-    return xyz_type(sin(0.5*xyzIn.y)*sin(0.5*xyzIn.z),
-                    sin(0.5*xyzIn.x)*sin(0.5*xyzIn.z),
-                    sin(0.5*xyzIn.x)*sin(0.5*xyzIn.y));
+    return xyz_type(sin(xyzIn.y)*sin(xyzIn.z),
+                    sin(xyzIn.x)*sin(xyzIn.z),
+                    sin(xyzIn.x)*sin(xyzIn.y));
 }
 
 xyz_type CurlCurlPolyTestRHS::evalVector(const xyz_type& xyzIn) const {
