@@ -19,7 +19,7 @@ Compadre:
     'blocked': true
   'remap':
     'weighting power': 4
-    'porder': 1
+    'porder': 2
     'quadrature order': 2
     'quadrature dimension': 1
     'quadrature type': 'line'
