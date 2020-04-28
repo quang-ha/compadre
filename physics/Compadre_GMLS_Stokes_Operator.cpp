@@ -223,7 +223,7 @@ void GMLS_StokesPhysics::initialize() {
     _pressure_neumann_GMLS = Teuchos::rcp<GMLS>(new GMLS(ReconstructionSpace::VectorTaylorPolynomial,
                         StaggeredEdgeIntegralSample,
                         StaggeredEdgeAnalyticGradientIntegralSample,
-                        _parameters->get<Teuchos::ParameterList>("remap").get<int>("porder"),
+                        _parameters->get<Teuchos::ParameterList>("remap").get<int>("porder") - 1,
                         3, "SVD", "STANDARD", "NEUMANN_GRAD_SCALAR"));
     _pressure_neumann_GMLS->setProblemData(boundary_kokkos_neighbor_lists_host,
                         kokkos_augmented_source_coordinates_host,
