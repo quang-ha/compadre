@@ -201,8 +201,7 @@ void GMLS_StokesPhysics::initialize() {
     _velocity_all_GMLS->generateAlphas(_parameters->get<Teuchos::ParameterList>("remap").get<int>("number of batches"));
 
     // pressure GMLS operator - all points
-    _pressure_all_GMLS = Teuchos::rcp<GMLS>(new GMLS(ReconstructionSpace::VectorTaylorPolynomial,
-                        StaggeredEdgeIntegralSample,
+    _pressure_all_GMLS = Teuchos::rcp<GMLS>(new GMLS(ReconstructionSpace::ScalarTaylorPolynomial,
                         StaggeredEdgeAnalyticGradientIntegralSample,
                         _parameters->get<Teuchos::ParameterList>("remap").get<int>("porder") - 1,
                         3, "SVD", "STANDARD", "NO_CONSTRAINT"));
@@ -212,16 +211,15 @@ void GMLS_StokesPhysics::initialize() {
                         kokkos_epsilons_host);
     _pressure_all_GMLS->setWeightingType(_parameters->get<Teuchos::ParameterList>("remap").get<std::string>("weighting type"));
     _pressure_all_GMLS->setWeightingPower(_parameters->get<Teuchos::ParameterList>("remap").get<int>("weighting power"));
-    _pressure_all_GMLS->setOrderOfQuadraturePoints(_parameters->get<Teuchos::ParameterList>("remap").get<int>("quadrature order"));
-    _pressure_all_GMLS->setDimensionOfQuadraturePoints(_parameters->get<Teuchos::ParameterList>("remap").get<int>("quadrature dimension"));
-    _pressure_all_GMLS->setQuadratureType(_parameters->get<Teuchos::ParameterList>("remap").get<std::string>("quadrature type"));
+    // _pressure_all_GMLS->setOrderOfQuadraturePoints(_parameters->get<Teuchos::ParameterList>("remap").get<int>("quadrature order"));
+    // _pressure_all_GMLS->setDimensionOfQuadraturePoints(_parameters->get<Teuchos::ParameterList>("remap").get<int>("quadrature dimension"));
+    // _pressure_all_GMLS->setQuadratureType(_parameters->get<Teuchos::ParameterList>("remap").get<std::string>("quadrature type"));
     _pressure_all_GMLS->addTargets(TargetOperation::DivergenceOfVectorPointEvaluation);
     _pressure_all_GMLS->addTargets(TargetOperation::GradientOfScalarPointEvaluation);
     _pressure_all_GMLS->generateAlphas(_parameters->get<Teuchos::ParameterList>("remap").get<int>("number of batches"));
 
     // pressure GMLS operator - boundary
-    _pressure_neumann_GMLS = Teuchos::rcp<GMLS>(new GMLS(ReconstructionSpace::VectorTaylorPolynomial,
-                        StaggeredEdgeIntegralSample,
+    _pressure_neumann_GMLS = Teuchos::rcp<GMLS>(new GMLS(ReconstructionSpace::ScalarTaylorPolynomial,
                         StaggeredEdgeAnalyticGradientIntegralSample,
                         _parameters->get<Teuchos::ParameterList>("remap").get<int>("porder") - 1,
                         3, "SVD", "STANDARD", "NEUMANN_GRAD_SCALAR"));
@@ -231,10 +229,10 @@ void GMLS_StokesPhysics::initialize() {
                         boundary_kokkos_epsilons_host);
     _pressure_neumann_GMLS->setTangentBundle(boundary_kokkos_tangent_bundles_host);
     _pressure_neumann_GMLS->setWeightingType(_parameters->get<Teuchos::ParameterList>("remap").get<std::string>("weighting type"));
-    _pressure_neumann_GMLS->setWeightingPower(_parameters->get<Teuchos::ParameterList>("remap").get<int>("weighting power"));
-    _pressure_neumann_GMLS->setOrderOfQuadraturePoints(_parameters->get<Teuchos::ParameterList>("remap").get<int>("quadrature order"));
-    _pressure_neumann_GMLS->setDimensionOfQuadraturePoints(_parameters->get<Teuchos::ParameterList>("remap").get<int>("quadrature dimension"));
-    _pressure_neumann_GMLS->setQuadratureType(_parameters->get<Teuchos::ParameterList>("remap").get<std::string>("quadrature type"));
+    // _pressure_neumann_GMLS->setWeightingPower(_parameters->get<Teuchos::ParameterList>("remap").get<int>("weighting power"));
+    // _pressure_neumann_GMLS->setOrderOfQuadraturePoints(_parameters->get<Teuchos::ParameterList>("remap").get<int>("quadrature order"));
+    // _pressure_neumann_GMLS->setDimensionOfQuadraturePoints(_parameters->get<Teuchos::ParameterList>("remap").get<int>("quadrature dimension"));
+    // _pressure_neumann_GMLS->setQuadratureType(_parameters->get<Teuchos::ParameterList>("remap").get<std::string>("quadrature type"));
     _pressure_neumann_GMLS->addTargets(TargetOperation::DivergenceOfVectorPointEvaluation);
     _pressure_neumann_GMLS->generateAlphas(_parameters->get<Teuchos::ParameterList>("remap").get<int>("number of batches"));
 
