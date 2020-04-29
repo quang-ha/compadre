@@ -130,7 +130,7 @@ void GMLS_StokesPhysics::initialize() {
     });
 
     auto epsilons = neighborhood->getHSupportSizes()->getLocalView<const host_view_type>();
-    Kokkos::View<double*> kokkos_epsilons("target_coordinates", target_coords->nLocal(), target_coords->nDim());
+    Kokkos::View<double*> kokkos_epsilons("epsilons", target_coords->nLocal());
     Kokkos::View<double*>::HostMirror kokkos_epsilons_host = Kokkos::create_mirror_view(kokkos_epsilons);
     Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(0,target_coords->nLocal()), KOKKOS_LAMBDA(const int i) {
         kokkos_epsilons_host(i) = epsilons(i,0);
@@ -142,7 +142,7 @@ void GMLS_StokesPhysics::initialize() {
         kokkos_flags_host(i) = bc_id(i, 0);
     });
 
-    Kokkos::View<double**> kokkos_normals("target_normals", target_coords->nLocal(), target_coords->nDim(), target_coords->nDim());
+    Kokkos::View<double**> kokkos_normals("target_normals", target_coords->nLocal(), target_coords->nDim());
     Kokkos::View<double**>::HostMirror kokkos_normals_host = Kokkos::create_mirror_view(kokkos_normals);
     Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(0,target_coords->nLocal()), KOKKOS_LAMBDA(const int i) {
         kokkos_normals_host(i, 0) = nx_vectors(i, 0);
