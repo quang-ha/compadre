@@ -165,7 +165,10 @@ int main(int argc, char* args[]) {
             }
 
             Teuchos::RCP<Compadre::AnalyticFunction> velocity_function, pressure_function;
-            if (parameters->get<std::string>("solution type")=="sine") {
+            if (parameters->get<std::string>("solution type")=="tanh") {
+                velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesVelocityTest));
+                pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesPressureTest));
+            } else if (parameters->get<std::string>("solution type")=="sine") {
                 velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlSineTest));
                 pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::SineProducts));
             } else {
@@ -262,7 +265,7 @@ int main(int argc, char* args[]) {
 
             TEUCHOS_TEST_FOR_EXCEPT_MSG(velocity_errors[i]!=velocity_errors[i], "NaN found in error norm.");
             TEUCHOS_TEST_FOR_EXCEPT_MSG(pressure_errors[i]!=pressure_errors[i], "NaN found in error norm.");
-            if (parameters->get<std::string>("solution type")=="sine") {
+            if ((parameters->get<std::string>("solution type")=="sine") || (parameters->get<std::string>("solution type")=="tanh"))  {
                 if (i>0) {
                     TEUCHOS_TEST_FOR_EXCEPT_MSG(velocity_errors[i-1]/velocity_errors[i] < 3.5, std::string("Second order not achieved for sine solution of velocity (should be 4). Is: ") + std::to_string(velocity_errors[i-1]/velocity_errors[i]));
                     TEUCHOS_TEST_FOR_EXCEPT_MSG(pressure_errors[i-1]/pressure_errors[i] < 3.5, std::string("Second order not achieved for sine solution of pressure (should be 4). Is: ") + std::to_string(pressure_errors[i-1]/pressure_errors[i]));
