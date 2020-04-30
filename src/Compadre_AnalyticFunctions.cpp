@@ -829,4 +829,16 @@ xyz_type CurlCurlPolyTest::evalVector(const xyz_type& xyzIn) const {
                     xyzIn.x + xyzIn.y - xyzIn.z + xyzIn.x*xyzIn.x + xyzIn.y*xyzIn.y + xyzIn.z*xyzIn.z + xyzIn.x*xyzIn.y - xyzIn.y*xyzIn.z - xyzIn.x*xyzIn.z + 1.0);
 }
 
+xyz_type StokesVelocityTestRHS::evalVector(const xyz_type& xyzIn) const {
+    return xyz_type(32.0*tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z)*(1.0/(std::pow(cosh(4.0*xyzIn.y), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.z), 2))),
+                    32.0*tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.z)*(1.0/(std::pow(cosh(4.0*xyzIn.x), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.z), 2))),
+                    32.0*tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y)*(1.0/(std::pow(cosh(4.0*xyzIn.x), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.y), 2))));
+}
+
+xyz_type StokesVelocityTest::evalVector(const xyz_type& xyzIn) const {
+    return xyz_type(tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z),
+                    tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.z),
+                    tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y));
+}
+
 }

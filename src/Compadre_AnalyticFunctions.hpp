@@ -496,5 +496,23 @@ class CurlCurlPolyTest : public AnalyticFunction {
 		virtual xyz_type evalVector(const xyz_type& xyzIn) const;
 };
 
+class StokesVelocityTestRHS : public AnalyticFunction {
+
+	typedef XyzVector xyz_type;
+
+	public :
+
+		virtual xyz_type evalVector(const xyz_type& xyzIn) const;
+};
+
+class StokesVelocityTest : public AnalyticFunction {
+
+	typedef XyzVector xyz_type;
+
+	public :
+
+		virtual xyz_type evalVector(const xyz_type& xyzIn) const;
+};
+
 }
 #endif 
