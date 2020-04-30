@@ -849,17 +849,17 @@ xyz_type StokesVelocityTest::evalVector(const xyz_type& xyzIn) const {
 // StokesPressureTest
 //
 
-scalar_type StokesPressureTest::evalScalar(const xyz_type& xyzIn) const {
+scalar_type StokesPressureTest::evalScalar(const xyz_type& xyzIn, const local_index_type input_comp) const {
     return tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z);
 }
 
-xyz_type StokesPressureTest::evalScalarDerivative(const xyz_type& xyzIn) const {
+xyz_type StokesPressureTest::evalScalarDerivative(const xyz_type& xyzIn, const local_index_type input_comp) const {
     return xyz_type((4.0/(std::pow(cosh(4.0*xyzIn.x), 2)))*tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z),
                     tanh(4.0*xyzIn.x)*(4.0/(std::pow(cosh(4.0*xyzIn.y), 2)))*tanh(4.0*xyzIn.z),
                     tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y)*(4.0/(std::pow(cosh(4.0*xyzIn.z), 2))));
 }
 
-scalar_type StokesPressureTest::evalScalarLaplacian(const xyz_type& xyzIn) const {
+scalar_type StokesPressureTest::evalScalarLaplacian(const xyz_type& xyzIn, const local_index_type input_comp) const {
     return -32.0*tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z)*(1.0/(std::pow(cosh(4.0*xyzIn.x), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.y), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.z), 2)));
 }
 
