@@ -514,5 +514,19 @@ class StokesVelocityTest : public AnalyticFunction {
 		virtual xyz_type evalVector(const xyz_type& xyzIn) const;
 };
 
+class StokesPressureTest : public AnalyticFunction {
+
+	typedef XyzVector xyz_type;
+
+	public :
+
+		virtual scalar_type evalScalar(const xyz_type& xIn) const;
+
+		virtual xyz_type evalScalarDerivative(const xyz_type& xIn) const;
+
+		virtual scalar_type evalScalarLaplacian(const xyz_type& xyzIn) const;
+
+};
+
 }
 #endif 
