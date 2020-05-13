@@ -71,7 +71,8 @@ Kokkos::View<size_t*, Kokkos::HostSpace> GMLS_StokesPhysics::getMaxEntriesPerRow
 }
 
 void GMLS_StokesPhysics::initialize() {
-    const local_index_type neighbors_needed = GMLS::getNP(Porder);
+    // const local_index_type neighbors_needed = GMLS::getNP(Porder);
+    const local_index_type neighbors_needed = 27;
 
     bool use_physical_coords = true; // can be set on the operator in the future
 
@@ -485,7 +486,8 @@ void GMLS_StokesPhysics::computeMatrix(local_index_type field_one, local_index_t
     auto pressure_field_id = _particles->getFieldManagerConst()->getIDOfFieldFromName("pressure");
     auto lm_pressure_field_id = _particles->getFieldManagerConst()->getIDOfFieldFromName("lm_pressure");
 
-    const local_index_type neighbors_needed = GMLS::getNP(Porder);
+    // const local_index_type neighbors_needed = GMLS::getNP(Porder);
+    const local_index_type neighbors_needed = 27;
 
     const local_dof_map_view_type local_to_dof_map = _dof_data->getDOFMap();
 

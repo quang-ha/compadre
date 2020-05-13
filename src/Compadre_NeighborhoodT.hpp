@@ -73,6 +73,8 @@ class NeighborhoodT {
 
         local_index_type computeMaxNumNeighbors(const bool global) const;
 
+        local_index_type computeMinNumNeighbors(const bool global) const;
+
         scalar_type computeMinHSupportSize(const bool global) const;
 
         scalar_type computeMaxHSupportSize(const bool global) const;
