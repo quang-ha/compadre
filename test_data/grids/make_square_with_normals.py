@@ -7,7 +7,7 @@ from netCDF4 import Dataset
 min_coord, max_coord = -1.0, 1.0
 
 # Number of points in each direction
-N = 24
+N = 6
 
 # Generate the 1D spacing
 X = np.linspace(min_coord, max_coord, N)
