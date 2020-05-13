@@ -56,16 +56,10 @@ dataset.createVariable('x', datatype='d', dimensions=('num_points'), zlib=True, 
 dataset.createVariable('y', datatype='d', dimensions=('num_points'), zlib=True, complevel=9,
         shuffle=True, fletcher32=False, contiguous=False, chunksizes=None,
         endian='native', least_significant_digit=None, fill_value=None)
-dataset.createVariable('z', datatype='d', dimensions=('num_points'), zlib=True, complevel=9,
-        shuffle=True, fletcher32=False, contiguous=False, chunksizes=None,
-        endian='native', least_significant_digit=None, fill_value=None)
 dataset.createVariable('nx', datatype='d', dimensions=('num_points'), zlib=True, complevel=9,
         shuffle=True, fletcher32=False, contiguous=False, chunksizes=None,
         endian='native', least_significant_digit=None, fill_value=None)
 dataset.createVariable('ny', datatype='d', dimensions=('num_points'), zlib=True, complevel=9,
-        shuffle=True, fletcher32=False, contiguous=False, chunksizes=None,
-        endian='native', least_significant_digit=None, fill_value=None)
-dataset.createVariable('nz', datatype='d', dimensions=('num_points'), zlib=True, complevel=9,
         shuffle=True, fletcher32=False, contiguous=False, chunksizes=None,
         endian='native', least_significant_digit=None, fill_value=None)
 dataset.createVariable('flag', datatype='i', dimensions=('num_points'), zlib=True, complevel=9,
