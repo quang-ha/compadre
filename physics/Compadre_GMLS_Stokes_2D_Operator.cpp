@@ -1,4 +1,4 @@
-#include <Compadre_GMLS_Stokes_Operator.hpp>
+#include <Compadre_GMLS_Stokes_2D_Operator.hpp>
 
 #include <Compadre_CoordsT.hpp>
 #include <Compadre_ParticlesT.hpp>
@@ -25,7 +25,7 @@ typedef Compadre::FieldT fields_type;
 typedef Compadre::NeighborhoodT neighborhood_type;
 typedef Compadre::XyzVector xyz_type;
 
-Kokkos::View<size_t*, Kokkos::HostSpace> GMLS_StokesPhysics::getMaxEntriesPerRow(local_index_type field_one, local_index_type field_two) {
+Kokkos::View<size_t*, Kokkos::HostSpace> GMLS_Stokes2DPhysics::getMaxEntriesPerRow(local_index_type field_one, local_index_type field_two) {
 
     auto comm = this->_particles->getCoordsConst()->getComm();
 
@@ -70,7 +70,7 @@ Kokkos::View<size_t*, Kokkos::HostSpace> GMLS_StokesPhysics::getMaxEntriesPerRow
     return maxEntriesPerRow;
 }
 
-void GMLS_StokesPhysics::initialize() {
+void GMLS_Stokes2DPhysics::initialize() {
     // const local_index_type neighbors_needed = GMLS::getNP(Porder);
     const local_index_type neighbors_needed = 27;
 
@@ -117,7 +117,6 @@ void GMLS_StokesPhysics::initialize() {
         xyz_type coordinate = source_coords->getLocalCoords(i, true /*include halo*/, use_physical_coords);
         kokkos_augmented_source_coordinates_host(i,0) = coordinate.x;
         kokkos_augmented_source_coordinates_host(i,1) = coordinate.y;
-        kokkos_augmented_source_coordinates_host(i,2) = coordinate.z;
     });
 
     Kokkos::View<double**> kokkos_target_coordinates("target_coordinates", target_coords->nLocal(), target_coords->nDim());
@@ -127,7 +126,6 @@ void GMLS_StokesPhysics::initialize() {
         xyz_type coordinate = target_coords->getLocalCoords(i, false /*include halo*/, use_physical_coords);
         kokkos_target_coordinates_host(i,0) = coordinate.x;
         kokkos_target_coordinates_host(i,1) = coordinate.y;
-        kokkos_target_coordinates_host(i,2) = coordinate.z;
     });
 
     auto epsilons = neighborhood->getHSupportSizes()->getLocalView<const host_view_type>();
@@ -148,7 +146,6 @@ void GMLS_StokesPhysics::initialize() {
     Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(0,target_coords->nLocal()), KOKKOS_LAMBDA(const int i) {
         kokkos_normals_host(i, 0) = nx_vectors(i, 0);
         kokkos_normals_host(i, 1) = ny_vectors(i, 0);
-        kokkos_normals_host(i, 2) = nz_vectors(i, 0);
     });
 
     // Extract out points without any BC
@@ -170,12 +167,9 @@ void GMLS_StokesPhysics::initialize() {
     Kokkos::View<double***> boundary_kokkos_tangent_bundles_host("target_tangent_bundles", nlocal_boundary, target_coords->nDim(), target_coords->nDim());
     Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(0,nlocal_boundary), KOKKOS_LAMBDA(const int i) {
         boundary_kokkos_tangent_bundles_host(i, 0, 0) = 0.0;
-        boundary_kokkos_tangent_bundles_host(i, 1, 0) = 0.0;
-        boundary_kokkos_tangent_bundles_host(i, 1, 1) = 0.0;
-        boundary_kokkos_tangent_bundles_host(i, 1, 2) = 0.0;
-        boundary_kokkos_tangent_bundles_host(i, 2, 0) = boundary_kokkos_normals_host(i, 0);
-        boundary_kokkos_tangent_bundles_host(i, 2, 1) = boundary_kokkos_normals_host(i, 1);
-        boundary_kokkos_tangent_bundles_host(i, 2, 2) = boundary_kokkos_normals_host(i, 2);
+        boundary_kokkos_tangent_bundles_host(i, 0, 1) = 0.0;
+        boundary_kokkos_tangent_bundles_host(i, 1, 0) = boundary_kokkos_normals_host(i, 0);
+        boundary_kokkos_tangent_bundles_host(i, 1, 1) = boundary_kokkos_normals_host(i, 1);
     });
 
     //****************
@@ -191,7 +185,7 @@ void GMLS_StokesPhysics::initialize() {
     _velocity_all_GMLS = Teuchos::rcp<GMLS>(new GMLS(ReconstructionSpace::DivergenceFreeVectorTaylorPolynomial,
                         VectorPointSample,
                         _parameters->get<Teuchos::ParameterList>("remap").get<int>("porder"),
-                        3, "SVD", "STANDARD", "NO_CONSTRAINT"));
+                        2, "SVD", "STANDARD", "NO_CONSTRAINT"));
     _velocity_all_GMLS->setProblemData(kokkos_neighbor_lists_host,
                         kokkos_augmented_source_coordinates_host,
                         kokkos_target_coordinates_host,
@@ -205,7 +199,7 @@ void GMLS_StokesPhysics::initialize() {
     _pressure_all_GMLS = Teuchos::rcp<GMLS>(new GMLS(ReconstructionSpace::ScalarTaylorPolynomial,
                         StaggeredEdgeAnalyticGradientIntegralSample,
                         _parameters->get<Teuchos::ParameterList>("remap").get<int>("porder") - 1,
-                        3, "SVD", "STANDARD", "NO_CONSTRAINT"));
+                        2, "SVD", "STANDARD", "NO_CONSTRAINT"));
     _pressure_all_GMLS->setProblemData(kokkos_neighbor_lists_host,
                         kokkos_augmented_source_coordinates_host,
                         kokkos_target_coordinates_host,
@@ -223,7 +217,7 @@ void GMLS_StokesPhysics::initialize() {
     _pressure_neumann_GMLS = Teuchos::rcp<GMLS>(new GMLS(ReconstructionSpace::ScalarTaylorPolynomial,
                         StaggeredEdgeAnalyticGradientIntegralSample,
                         _parameters->get<Teuchos::ParameterList>("remap").get<int>("porder") - 1,
-                        3, "SVD", "STANDARD", "NEUMANN_GRAD_SCALAR"));
+                        2, "SVD", "STANDARD", "NEUMANN_GRAD_SCALAR"));
     _pressure_neumann_GMLS->setProblemData(boundary_kokkos_neighbor_lists_host,
                         kokkos_augmented_source_coordinates_host,
                         boundary_kokkos_target_coordinates_host,
@@ -240,7 +234,7 @@ void GMLS_StokesPhysics::initialize() {
     GMLSTime->stop();
 }
 
-Teuchos::RCP<crs_graph_type> GMLS_StokesPhysics::computeGraph(local_index_type field_one, local_index_type field_two) {
+Teuchos::RCP<crs_graph_type> GMLS_Stokes2DPhysics::computeGraph(local_index_type field_one, local_index_type field_two) {
 
     if (field_two == -1) {
         field_two = field_one;
@@ -472,7 +466,7 @@ Teuchos::RCP<crs_graph_type> GMLS_StokesPhysics::computeGraph(local_index_type f
     return this->_A_graph;
 }
 
-void GMLS_StokesPhysics::computeMatrix(local_index_type field_one, local_index_type field_two, scalar_type time) {
+void GMLS_Stokes2DPhysics::computeMatrix(local_index_type field_one, local_index_type field_two, scalar_type time) {
 
     bool use_physical_coords = true; // can be set on the operator in the future
 
@@ -743,7 +737,7 @@ void GMLS_StokesPhysics::computeMatrix(local_index_type field_one, local_index_t
     ComputeMatrixTime->stop();
 }
 
-const std::vector<InteractingFields> GMLS_StokesPhysics::gatherFieldInteractions() {
+const std::vector<InteractingFields> GMLS_Stokes2DPhysics::gatherFieldInteractions() {
     std::vector<InteractingFields> field_interactions;
 
     field_interactions.push_back(InteractingFields(op_needing_interaction::physics,

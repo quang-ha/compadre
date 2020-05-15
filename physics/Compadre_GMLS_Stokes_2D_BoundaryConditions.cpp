@@ -1,4 +1,4 @@
-#include <Compadre_GMLS_Stokes_BoundaryConditions.hpp>
+#include <Compadre_GMLS_Stokes_2D_BoundaryConditions.hpp>
 
 #include <Compadre_CoordsT.hpp>
 #include <Compadre_ParticlesT.hpp>
@@ -13,19 +13,16 @@ namespace Compadre {
 typedef Compadre::FieldT fields_type;
 typedef Compadre::XyzVector xyz_type;
 
-void GMLS_StokesBoundaryConditions::flagBoundaries() {
+void GMLS_Stokes2DBoundaryConditions::flagBoundaries() {
 }
 
-void GMLS_StokesBoundaryConditions::applyBoundaries(local_index_type field_one, local_index_type field_two, scalar_type time) {
+void GMLS_Stokes2DBoundaryConditions::applyBoundaries(local_index_type field_one, local_index_type field_two, scalar_type time) {
     Teuchos::RCP<Compadre::AnalyticFunction> velocity_function, pressure_function;
-    if (_parameters->get<std::string>("solution type")=="tanh") {
-        velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesVelocityTest));
-        pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesPressureTest));
-    } else if (_parameters->get<std::string>("solution type")=="sine") {
-        velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlSineTest));
+    if (_parameters->get<std::string>("solution type")=="sine") {
+        velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurl2DSineTest));
         pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::SineProducts));
     } else {
-        velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlPolyTest));
+        velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurl2DPolyTest));
         pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::SecondOrderBasis));
     }
 
@@ -59,7 +56,7 @@ void GMLS_StokesBoundaryConditions::applyBoundaries(local_index_type field_one, 
     }
 }
 
-std::vector<InteractingFields> GMLS_StokesBoundaryConditions::gatherFieldInteractions() {
+std::vector<InteractingFields> GMLS_Stokes2DBoundaryConditions::gatherFieldInteractions() {
     std::vector<InteractingFields> field_interactions;
     return field_interactions;
 }

@@ -1,5 +1,5 @@
-#ifndef _COMPADRE_GMLS_STOKESPHYSICS_HPP_
-#define _COMPADRE_GMLS_STOKESPHYSICS_HPP_
+#ifndef _COMPADRE_GMLS_STOKES2DPHYSICS_HPP_
+#define _COMPADRE_GMLS_STOKES2DPHYSICS_HPP_
 
 #include <Compadre_PhysicsT.hpp>
 
@@ -13,7 +13,7 @@ class GMLS;
 class ParticlesT;
 class NeighborhoodT;
 
-class GMLS_StokesPhysics : public PhysicsT {
+class GMLS_Stokes2DPhysics : public PhysicsT {
     protected:
         typedef Compadre::ParticlesT particle_type;
         local_index_type Porder;
@@ -25,12 +25,12 @@ class GMLS_StokesPhysics : public PhysicsT {
         Kokkos::View<int*>::HostMirror _internal_filtered_flags;
         Kokkos::View<int*>::HostMirror _boundary_filtered_flags;
 
-        GMLS_StokesPhysics(Teuchos::RCP<particle_type> particles, local_index_type t_Porder,
+        GMLS_Stokes2DPhysics(Teuchos::RCP<particle_type> particles, local_index_type t_Porder,
                            Teuchos::RCP<crs_graph_type> A_graph = Teuchos::null,
                            Teuchos::RCP<crs_matrix_type> A = Teuchos::null) :
             PhysicsT(particles, A_graph, A), Porder(t_Porder) {}
 
-        virtual ~GMLS_StokesPhysics() {}
+        virtual ~GMLS_Stokes2DPhysics() {}
 
         virtual Teuchos::RCP<crs_graph_type> computeGraph(local_index_type field_one, local_index_type field_two = -1);
 

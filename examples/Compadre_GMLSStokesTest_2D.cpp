@@ -18,9 +18,9 @@
 
 #include <Compadre_GMLS.hpp>
 
-#include <Compadre_GMLS_Stokes_Operator.hpp>
-#include <Compadre_GMLS_Stokes_BoundaryConditions.hpp>
-#include <Compadre_GMLS_Stokes_Sources.hpp>
+#include <Compadre_GMLS_Stokes_2D_Operator.hpp>
+#include <Compadre_GMLS_Stokes_2D_BoundaryConditions.hpp>
+#include <Compadre_GMLS_Stokes_2D_Sources.hpp>
 
 typedef int LO;
 typedef long GO;
@@ -89,9 +89,9 @@ int main(int argc, char* args[]) {
             FirstReadTime->stop();
 
             particles->zoltan2Initialize();
-            particles->getFieldManager()->createField(3, "velocity");
+            particles->getFieldManager()->createField(2, "velocity");
             particles->getFieldManager()->createField(1, "pressure");
-            particles->getFieldManager()->createField(3, "velocity_exact");
+            particles->getFieldManager()->createField(2, "velocity_exact");
             particles->getFieldManager()->createField(1, "pressure_exact");
             particles->getFieldManager()->createField(1, "lm_pressure");
 
@@ -130,12 +130,12 @@ int main(int argc, char* args[]) {
                 Teuchos::RCP<Compadre::ProblemT> problem = Teuchos::rcp(new Compadre::ProblemT(particles));
 
                 // construct physics, sources and boundary conditions
-                Teuchos::RCP<Compadre::GMLS_StokesPhysics> physics =
-                    Teuchos::rcp(new Compadre::GMLS_StokesPhysics(particles, Porder));
-                Teuchos::RCP<Compadre::GMLS_StokesSources> source =
-                    Teuchos::rcp(new Compadre::GMLS_StokesSources(particles));
-                Teuchos::RCP<Compadre::GMLS_StokesBoundaryConditions> bcs =
-                    Teuchos::rcp(new Compadre::GMLS_StokesBoundaryConditions(particles));
+                Teuchos::RCP<Compadre::GMLS_Stokes2DPhysics> physics =
+                    Teuchos::rcp(new Compadre::GMLS_Stokes2DPhysics(particles, Porder));
+                Teuchos::RCP<Compadre::GMLS_Stokes2DSources> source =
+                    Teuchos::rcp(new Compadre::GMLS_Stokes2DSources(particles));
+                Teuchos::RCP<Compadre::GMLS_Stokes2DBoundaryConditions> bcs =
+                    Teuchos::rcp(new Compadre::GMLS_Stokes2DBoundaryConditions(particles));
 
                 // set physics, sources and boundary conditions in the problem
                 problem->setPhysics(physics);
@@ -168,14 +168,11 @@ int main(int argc, char* args[]) {
             }
 
             Teuchos::RCP<Compadre::AnalyticFunction> velocity_function, pressure_function;
-            if (parameters->get<std::string>("solution type")=="tanh") {
-                velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesVelocityTest));
-                pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesPressureTest));
-            } else if (parameters->get<std::string>("solution type")=="sine") {
-                velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlSineTest));
+            if (parameters->get<std::string>("solution type")=="sine") {
+                velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurl2DSineTest));
                 pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::SineProducts));
             } else {
-                velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlPolyTest));
+                velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurl2DPolyTest));
                 pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::SecondOrderBasis));
             }
 
@@ -216,15 +213,14 @@ int main(int argc, char* args[]) {
                 // calculate velocity norm
                 std::vector<ST> velocity_computed = particles->getFieldManagerConst()->getFieldByName("velocity")->getLocalVectorVal(j);
                 Compadre::XyzVector velocity_exact_xyz = velocity_function->evalVector(xyz);
-                std::vector<ST> velocity_exact(3);
+                std::vector<ST> velocity_exact(2);
                 velocity_exact_xyz.convertToStdVector(velocity_exact);
-                for (LO id=0; id<3; id++) {
+                for (LO id=0; id<2; id++) {
                     error_velocity_norm += (velocity_computed[id] - velocity_exact[id])*(velocity_computed[id] - velocity_exact[id]);
                     velocity_norm += velocity_exact[id]*velocity_exact[id];
                     // Write to output velocity field
                     velocity_exact_view(j, 0) = velocity_exact[0];
                     velocity_exact_view(j, 1) = velocity_exact[1];
-                    velocity_exact_view(j, 2) = velocity_exact[2];
                 }
                 // remove the mean from the pressure field
                 ST pressure_val = particles->getFieldManagerConst()->getFieldByName("pressure")->getLocalScalarVal(j) - pressure_global_val_mean;

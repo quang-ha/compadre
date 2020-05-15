@@ -1,5 +1,5 @@
-#ifndef _COMPADRE_GMLS_STOKESBOUNDARYCONDITIONS_
-#define _COMPADRE_GMLS_STOKESBOUNDARYCONDITIONS_
+#ifndef _COMPADRE_GMLS_STOKES2DBOUNDARYCONDITIONS_
+#define _COMPADRE_GMLS_STOKES2DBOUNDARYCONDITIONS_
 
 #include <Compadre_BoundaryConditionsT.hpp>
 
@@ -7,15 +7,15 @@ namespace Compadre {
 
 class ParticlesT;
 
-class GMLS_StokesBoundaryConditions : public BoundaryConditionsT {
+class GMLS_Stokes2DBoundaryConditions : public BoundaryConditionsT {
     protected:
         typedef Compadre::ParticlesT particle_type;
 
     public:
-        GMLS_StokesBoundaryConditions(Teuchos::RCP<particle_type> particles, mvec_type* b = NULL) :
+        GMLS_Stokes2DBoundaryConditions(Teuchos::RCP<particle_type> particles, mvec_type* b = NULL) :
                 BoundaryConditionsT(particles, b) {}
 
-        virtual ~GMLS_StokesBoundaryConditions() {}
+        virtual ~GMLS_Stokes2DBoundaryConditions() {}
 
         virtual void flagBoundaries();
 

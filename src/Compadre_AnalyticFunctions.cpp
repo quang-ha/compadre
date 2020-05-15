@@ -803,7 +803,7 @@ xyz_type CangaSphereTransform::evalVector(const xyz_type& latLonIn) const {
 }
 
 //
-// CurlCurlSineTest
+// CurlCurlTest
 //
 
 xyz_type CurlCurlSineTestRHS::evalVector(const xyz_type& xyzIn) const {
@@ -831,37 +831,30 @@ xyz_type CurlCurlPolyTest::evalVector(const xyz_type& xyzIn) const {
 }
 
 //
-// StokesVelocityTest
+// CurlCurl in 2D Test
 //
 
-xyz_type StokesVelocityTestRHS::evalVector(const xyz_type& xyzIn) const {
-    return xyz_type(32.0*tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z)*(1.0/(std::pow(cosh(4.0*xyzIn.y), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.z), 2))),
-                    32.0*tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.z)*(1.0/(std::pow(cosh(4.0*xyzIn.x), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.z), 2))),
-                    32.0*tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y)*(1.0/(std::pow(cosh(4.0*xyzIn.x), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.y), 2))));
+xyz_type CurlCurl2DSineTestRHS::evalVector(const xyz_type& xyzIn) const {
+    return xyz_type(2.0*cos(xyzIn.x)*sin(xyzIn.y),
+                    -2.0*sin(xyzIn.x)*sin(xyzIn.y),
+                    0.0);
 }
 
-xyz_type StokesVelocityTest::evalVector(const xyz_type& xyzIn) const {
-    return xyz_type(tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z),
-                    tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.z),
-                    tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y));
+xyz_type CurlCurl2DSineTest::evalVector(const xyz_type& xyzIn) const {
+    return xyz_type(cos(xyzIn.x)*sin(xyzIn.y),
+                    -sin(xyzIn.x)*cos(xyzIn.y));
 }
 
-//
-// StokesPressureTest
-//
-
-scalar_type StokesPressureTest::evalScalar(const xyz_type& xyzIn, const local_index_type input_comp) const {
-    return tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z);
+xyz_type CurlCurl2DPolyTestRHS::evalVector(const xyz_type& xyzIn) const {
+    return xyz_type(-4.0,
+                    -4.0,
+                    0.0);
 }
 
-xyz_type StokesPressureTest::evalScalarDerivative(const xyz_type& xyzIn, const local_index_type input_comp) const {
-    return xyz_type((4.0/(std::pow(cosh(4.0*xyzIn.x), 2)))*tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z),
-                    tanh(4.0*xyzIn.x)*(4.0/(std::pow(cosh(4.0*xyzIn.y), 2)))*tanh(4.0*xyzIn.z),
-                    tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y)*(4.0/(std::pow(cosh(4.0*xyzIn.z), 2))));
-}
-
-scalar_type StokesPressureTest::evalScalarLaplacian(const xyz_type& xyzIn, const local_index_type input_comp) const {
-    return -32.0*tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z)*(1.0/(std::pow(cosh(4.0*xyzIn.x), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.y), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.z), 2)));
+xyz_type CurlCurl2DPolyTest::evalVector(const xyz_type& xyzIn) const {
+    return xyz_type(1.0 + xyzIn.y + xyzIn.x + xyzIn.y*xyzIn.y + xyzIn.x*xyzIn.x - 2.0*xyzIn.x*xyzIn.y,
+                    1.0 + xyzIn.x - xyzIn.y + xyzIn.x*xyzIn.x - 2.0*xyzIn.x*xyzIn.y + xyzIn.y*xyzIn.y,
+                    0.0);
 }
 
 }
