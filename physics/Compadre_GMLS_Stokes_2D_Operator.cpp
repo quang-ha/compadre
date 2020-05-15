@@ -71,8 +71,7 @@ Kokkos::View<size_t*, Kokkos::HostSpace> GMLS_Stokes2DPhysics::getMaxEntriesPerR
 }
 
 void GMLS_Stokes2DPhysics::initialize() {
-    // const local_index_type neighbors_needed = GMLS::getNP(Porder);
-    const local_index_type neighbors_needed = 27;
+    const local_index_type neighbors_needed = GMLS::getNP(Porder, 2);
 
     bool use_physical_coords = true; // can be set on the operator in the future
 
@@ -85,7 +84,6 @@ void GMLS_Stokes2DPhysics::initialize() {
     const host_view_local_index_type bc_id = this->_particles->getFlags()->getLocalView<host_view_local_index_type>();
     const host_view_type nx_vectors = this->_particles->getFieldManager()->getFieldByName("nx")->getMultiVectorPtrConst()->getLocalView<host_view_type>();
     const host_view_type ny_vectors = this->_particles->getFieldManager()->getFieldByName("ny")->getMultiVectorPtrConst()->getLocalView<host_view_type>();
-    const host_view_type nz_vectors = this->_particles->getFieldManager()->getFieldByName("nz")->getMultiVectorPtrConst()->getLocalView<host_view_type>();
 
     //***************
     //
@@ -480,8 +478,7 @@ void GMLS_Stokes2DPhysics::computeMatrix(local_index_type field_one, local_index
     auto pressure_field_id = _particles->getFieldManagerConst()->getIDOfFieldFromName("pressure");
     auto lm_pressure_field_id = _particles->getFieldManagerConst()->getIDOfFieldFromName("lm_pressure");
 
-    // const local_index_type neighbors_needed = GMLS::getNP(Porder);
-    const local_index_type neighbors_needed = 27;
+    const local_index_type neighbors_needed = GMLS::getNP(Porder, 2);
 
     const local_dof_map_view_type local_to_dof_map = _dof_data->getDOFMap();
 

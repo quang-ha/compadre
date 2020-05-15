@@ -54,6 +54,8 @@ int main(int argc, char* args[]) {
     Teuchos::RCP<Teuchos::Time> WriteTime = Teuchos::TimeMonitor::getNewCounter("Write Time");
     Teuchos::RCP<Teuchos::Time> SecondReadTime = Teuchos::TimeMonitor::getNewCounter("2nd Read Time");
 
+    local_index_type input_dim = parameters->get<Teuchos::ParameterList>("io").get<local_index_type>("input dimensions");
+
     // This proceed setting up the problem so that the parameters will be propagated down into the physics and bcs
     try {
         parameters->get<std::string>("solution type");
@@ -78,7 +80,7 @@ int main(int argc, char* args[]) {
 
             std::string testfilename(fnames[i]);
 
-            Teuchos::RCP<Compadre::ParticlesT> particles = Teuchos::rcp(new Compadre::ParticlesT(parameters, comm));
+            Teuchos::RCP<Compadre::ParticlesT> particles = Teuchos::rcp(new Compadre::ParticlesT(parameters, comm, input_dim));
             const CT* coords = (CT*)(particles->getCoordsConst());
 
             // Read in data file
@@ -107,8 +109,7 @@ int main(int argc, char* args[]) {
 
                 particles->createNeighborhood();
 
-                // LO neighbors_needed = Compadre::GMLS::getNP(Porder);
-                LO neighbors_needed = 27;
+                LO neighbors_needed = Compadre::GMLS::getNP(Porder, 2);
 
                 particles->getNeighborhood()->constructAllNeighborLists(particles->getCoordsConst()->getHaloSize(),
                         parameters->get<Teuchos::ParameterList>("neighborhood").get<std::string>("search type"),
