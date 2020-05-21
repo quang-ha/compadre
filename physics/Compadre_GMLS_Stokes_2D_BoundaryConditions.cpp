@@ -46,7 +46,7 @@ void GMLS_Stokes2DBoundaryConditions::applyBoundaries(local_index_type field_one
     for (local_index_type i=0; i<nlocal; i++) {
         for (local_index_type k=0; k<fields[field_one]->nDim(); k++) {
             const local_index_type dof = local_to_dof_map(i, field_one, k);
-            xyz_type pt(pts(i, 0), pts(i, 1), pts(i, 2));
+            xyz_type pt(pts(i, 0), pts(i, 1), 0.0);
             if (field_one == velocity_field_id && field_two == velocity_field_id) {
                 if (bc_id(i, 0) == 1) {
                     rhs_vals(dof, 0) = velocity_function->evalVector(pt)[k];
