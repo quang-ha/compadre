@@ -15,11 +15,11 @@ Compadre:
     'vtk produce mesh': false
     'input dimensions': 2
   'solver':
-    'type': 'iterative'
-    'file': '../test_data/parameter_lists/gmls_stokes/solver_amg.xml'
+    'type': 'direct'
+    'file': '../test_data/parameter_lists/gmls_stokes_2D/solver_amg.xml'
     'blocked': true
   'remap':
-    'weighting power': 4
+    'weighting power': 2
     'porder': 2
     'quadrature order': 2
     'quadrature dimension': 1
