@@ -577,7 +577,7 @@ void GMLS_Stokes2DPhysics::computeMatrix(local_index_type field_one, local_index
                         scalar_type collapsed_value = 0.0;
                         for (local_index_type m=0; m<fields[field_two]->nDim(); m++) {
                             // Obtained the normal direction
-                            scalar_type normal_comp = _pressure_neumann_GMLS->getTangentBundle(i, 2, m);
+                            scalar_type normal_comp = _pressure_neumann_GMLS->getTangentBundle(i, 1, m);
                             collapsed_value += b_i*normal_comp*_velocity_all_GMLS->getAlpha1TensorTo1Tensor(TargetOperation::CurlCurlOfVectorPointEvaluation, _boundary_filtered_flags(i), m /* output component*/, l, n /*input component*/);
                         }
                         val_data(l*fields[field_two]->nDim() + n) = collapsed_value;
