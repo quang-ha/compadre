@@ -836,13 +836,14 @@ xyz_type CurlCurlPolyTest::evalVector(const xyz_type& xyzIn) const {
 
 xyz_type CurlCurl2DSineTestRHS::evalVector(const xyz_type& xyzIn) const {
     return xyz_type(2.0*cos(xyzIn.x)*sin(xyzIn.y),
-                    -2.0*sin(xyzIn.x)*sin(xyzIn.y),
+                    -2.0*sin(xyzIn.x)*cos(xyzIn.y),
                     0.0);
 }
 
 xyz_type CurlCurl2DSineTest::evalVector(const xyz_type& xyzIn) const {
     return xyz_type(cos(xyzIn.x)*sin(xyzIn.y),
-                    -sin(xyzIn.x)*cos(xyzIn.y));
+                    -sin(xyzIn.x)*cos(xyzIn.y),
+                    0.0);
 }
 
 xyz_type CurlCurl2DPolyTestRHS::evalVector(const xyz_type& xyzIn) const {
