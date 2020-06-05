@@ -170,6 +170,8 @@ void GMLS_StokesPhysics::initialize() {
     Kokkos::View<double***> boundary_kokkos_tangent_bundles_host("target_tangent_bundles", nlocal_boundary, target_coords->nDim(), target_coords->nDim());
     Kokkos::parallel_for(Kokkos::RangePolicy<Kokkos::DefaultHostExecutionSpace>(0,nlocal_boundary), KOKKOS_LAMBDA(const int i) {
         boundary_kokkos_tangent_bundles_host(i, 0, 0) = 0.0;
+        boundary_kokkos_tangent_bundles_host(i, 0, 1) = 0.0;
+        boundary_kokkos_tangent_bundles_host(i, 0, 2) = 0.0;
         boundary_kokkos_tangent_bundles_host(i, 1, 0) = 0.0;
         boundary_kokkos_tangent_bundles_host(i, 1, 1) = 0.0;
         boundary_kokkos_tangent_bundles_host(i, 1, 2) = 0.0;
