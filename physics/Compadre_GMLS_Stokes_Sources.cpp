@@ -83,7 +83,7 @@ void GMLS_StokesSources::evaluateRHS(local_index_type field_one, local_index_typ
 
                 // Setting up the constraint value - first obtain the gradient of the function
                 xyz_type pt(pts(boundary_filtered_flags(i), 0), pts(boundary_filtered_flags(i), 1), pts(boundary_filtered_flags(i), 2));
-                xyz_type force_term = pressure_function->evalScalarDerivative(pt) - velocity_function->evalVector(pt);
+                xyz_type force_term = pressure_function->evalScalarDerivative(pt) + velocity_function->evalVector(pt);
                 scalar_type g = force_term.x*_physics->_pressure_neumann_GMLS->getTangentBundle(i, 2, 0)
                     + force_term.y*_physics->_pressure_neumann_GMLS->getTangentBundle(i, 2, 1)
                     + force_term.z*_physics->_pressure_neumann_GMLS->getTangentBundle(i, 2, 2);
