@@ -578,7 +578,7 @@ void GMLS_Stokes2DPhysics::computeMatrix(local_index_type field_one, local_index
                         for (local_index_type m=0; m<fields[field_two]->nDim(); m++) {
                             // Obtained the normal direction
                             scalar_type normal_comp = _pressure_neumann_GMLS->getTangentBundle(i, 1, m);
-                            collapsed_value += b_i*normal_comp*_velocity_all_GMLS->getAlpha1TensorTo1Tensor(TargetOperation::CurlCurlOfVectorPointEvaluation, _boundary_filtered_flags(i), m /* output component*/, l, n /*input component*/);
+                            collapsed_value -= b_i*normal_comp*_velocity_all_GMLS->getAlpha1TensorTo1Tensor(TargetOperation::CurlCurlOfVectorPointEvaluation, _boundary_filtered_flags(i), m /* output component*/, l, n /*input component*/);
                         }
                         val_data(l*fields[field_two]->nDim() + n) = collapsed_value;
                     }
@@ -623,7 +623,7 @@ void GMLS_Stokes2DPhysics::computeMatrix(local_index_type field_one, local_index
                 }
             }
         });
-
+        Kokkos::fence();
         // Put values from Neumann GMLS into matrix
         int nlocal_boundary = _boundary_filtered_flags.extent(0);
         Kokkos::parallel_for(host_team_policy(nlocal_boundary, Kokkos::AUTO).set_scratch_size(host_scratch_team_level, Kokkos::PerTeam(team_scratch_size)), [=](const host_member_type& teamMember) {
@@ -729,6 +729,7 @@ void GMLS_Stokes2DPhysics::computeMatrix(local_index_type field_one, local_index
             }
         }
     }
+    Kokkos::fence();
 
     TEUCHOS_ASSERT(!this->_A.is_null());
     ComputeMatrixTime->stop();
