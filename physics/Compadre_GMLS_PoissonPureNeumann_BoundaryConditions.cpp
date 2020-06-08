@@ -39,18 +39,6 @@ void GMLS_PoissonPureNeumannBoundaryConditions::applyBoundaries(local_index_type
 
     // obtaint the ID for the velocity and the pressure field
     auto solution_field_id = _particles->getFieldManagerConst()->getIDOfFieldFromName("solution");
-
-    for (local_index_type i=0; i<nlocal; i++) {
-        for (local_index_type k=0; k<fields[field_one]->nDim(); k++) {
-            const local_index_type dof = local_to_dof_map(i, field_one, k);
-            xyz_type pt(pts(i, 0), pts(i, 1), pts(i, 2));
-            if (field_one == solution_field_id && field_two == solution_field_id) {
-                if (bc_id(i, 0) == 1) {
-                    rhs_vals(dof, 0) = function->evalScalar(pt);
-                }
-            }
-        }
-    }
 }
 
 std::vector<InteractingFields> GMLS_PoissonPureNeumannBoundaryConditions::gatherFieldInteractions() {

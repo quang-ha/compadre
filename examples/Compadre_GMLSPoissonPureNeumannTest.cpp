@@ -65,8 +65,8 @@ int main(int argc, char* args[]) {
         std::vector<double> hsize(1);
         std::vector<double> errors(1);
         const std::string filename_prefix = parameters->get<Teuchos::ParameterList>("io").get<std::string>("input file prefix");
-        fnames[0] = filename_prefix + "12.nc";
-        hsize[0] = 12;
+        fnames[0] = filename_prefix + "48.nc";
+        hsize[0] = 48;
 
         TEUCHOS_TEST_FOR_EXCEPT_MSG(parameters->get<int>("loop size")>3, "Only three mesh levels available for this problem.");
 
@@ -115,8 +115,10 @@ int main(int argc, char* args[]) {
                         parameters->get<Teuchos::ParameterList>("neighborhood").get<double>("radii post search scaling"));
 
                 auto max_h = particles->getNeighborhood()->computeMaxHSupportSize(true);
+                auto min_neighbors = particles->getNeighborhood()->computeMinNumNeighbors(true);
                 if (comm->getRank()==0) {
                     std::cout << "max _h " << max_h << std::endl;
+                    std::cout << "min neighbors " << min_neighbors << std::endl;
                 }
 
                 // Iterative solver for the problem
