@@ -634,7 +634,7 @@ void GMLS_StokesPhysics::computeMatrix(local_index_type field_one, local_index_t
                 }
             }
         });
-
+        Kokkos::fence();
         // Put values from Neumann GMLS into matrix
         int nlocal_boundary = _boundary_filtered_flags.extent(0);
         Kokkos::parallel_for(host_team_policy(nlocal_boundary, Kokkos::AUTO).set_scratch_size(host_scratch_team_level, Kokkos::PerTeam(team_scratch_size)), [=](const host_member_type& teamMember) {
@@ -740,6 +740,7 @@ void GMLS_StokesPhysics::computeMatrix(local_index_type field_one, local_index_t
             }
         }
     }
+    Kokkos::fence();
 
     TEUCHOS_ASSERT(!this->_A.is_null());
     ComputeMatrixTime->stop();
