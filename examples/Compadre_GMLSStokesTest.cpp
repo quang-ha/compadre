@@ -55,20 +55,14 @@ int main(int argc, char* args[]) {
     Teuchos::RCP<Teuchos::Time> SecondReadTime = Teuchos::TimeMonitor::getNewCounter("2nd Read Time");
 
     // This proceed setting up the problem so that the parameters will be propagated down into the physics and bcs
-    try {
-        parameters->get<std::string>("solution type");
-    } catch (Teuchos::Exceptions::InvalidParameter & exception) {
-        parameters->set<std::string>("solution type", "sine");
-    }
-
     {
         std::vector<std::string> fnames(1);
         std::vector<double> hsize(1);
         std::vector<double> velocity_errors(1);
         std::vector<double> pressure_errors(1);
         const std::string filename_prefix = parameters->get<Teuchos::ParameterList>("io").get<std::string>("input file prefix");
-        fnames[0] = filename_prefix + "6.nc";
-        hsize[0] = 6;
+        fnames[0] = filename_prefix + "24.nc";
+        hsize[0] = 24;
 
         TEUCHOS_TEST_FOR_EXCEPT_MSG(parameters->get<int>("loop size")>3, "Only three mesh levels available for this problem.");
 
@@ -168,16 +162,8 @@ int main(int argc, char* args[]) {
             }
 
             Teuchos::RCP<Compadre::AnalyticFunction> velocity_function, pressure_function;
-            if (parameters->get<std::string>("solution type")=="tanh") {
-                velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesVelocityTest));
-                pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesPressureTest));
-            } else if (parameters->get<std::string>("solution type")=="sine") {
-                velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlSineTest));
-                pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::SineProducts));
-            } else {
-                velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlPolyTest));
-                pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::SecondOrderBasis));
-            }
+            velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesVelocityTest));
+            pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesPressureTest));
 
             // In order to comptue the error norm for pure-Neumann pressure field, the mean value of
             // the computed pressure and the exact pressure is required
