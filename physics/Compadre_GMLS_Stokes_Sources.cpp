@@ -19,19 +19,6 @@ typedef Compadre::NeighborhoodT neighborhood_type;
 
 void GMLS_StokesSources::evaluateRHS(local_index_type field_one, local_index_type field_two, scalar_type time) {
     Teuchos::RCP<Compadre::AnalyticFunction> velocity_function, velocity_true_function, pressure_function;
-    if (_parameters->get<std::string>("solution type")=="tanh") {
-        velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesVelocityTestRHS));
-        velocity_true_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesVelocityTest));
-        pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::StokesPressureTest));
-    } else if (_parameters->get<std::string>("solution type")=="sine") {
-        velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlSineTestRHS));
-        velocity_true_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlSineTest));
-        pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::SineProducts));
-    } else {
-        velocity_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlPolyTestRHS));
-        velocity_true_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::CurlCurlPolyTest));
-        pressure_function = Teuchos::rcp_static_cast<Compadre::AnalyticFunction>(Teuchos::rcp(new Compadre::SecondOrderBasis));
-    }
 
     TEUCHOS_TEST_FOR_EXCEPT_MSG(_b==NULL, "Tpetra Multivector for RHS not yet specified.");
     if (field_two == -1) {
@@ -59,10 +46,10 @@ void GMLS_StokesSources::evaluateRHS(local_index_type field_one, local_index_typ
             xyz_type pt(pts(i, 0), pts(i, 1), pts(i, 2));
             if (field_one == velocity_field_id && field_two == velocity_field_id) {
                 if (bc_id(i, 0) == 0) {
-                    rhs_vals(dof, 0) = velocity_function->evalVector(pt)[k] + pressure_function->evalScalarDerivative(pt)[k];
+                    rhs_vals(dof, 0) = 0.0;
                 }
             } else if (field_one == pressure_field_id && field_two == pressure_field_id) {
-                rhs_vals(dof, 0) = pressure_function->evalScalarLaplacian(pt);
+                rhs_vals(dof, 0) = 0.0;
             }
         }
     }
@@ -83,7 +70,7 @@ void GMLS_StokesSources::evaluateRHS(local_index_type field_one, local_index_typ
 
                 // Setting up the constraint value - first obtain the gradient of the function
                 xyz_type pt(pts(boundary_filtered_flags(i), 0), pts(boundary_filtered_flags(i), 1), pts(boundary_filtered_flags(i), 2));
-                xyz_type force_term = pressure_function->evalScalarDerivative(pt) + velocity_function->evalVector(pt);
+                xyz_type force_term(0.0, 0.0, 0.0);
                 scalar_type g = force_term.x*_physics->_pressure_neumann_GMLS->getTangentBundle(i, 2, 0)
                     + force_term.y*_physics->_pressure_neumann_GMLS->getTangentBundle(i, 2, 1)
                     + force_term.z*_physics->_pressure_neumann_GMLS->getTangentBundle(i, 2, 2);
