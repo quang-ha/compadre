@@ -1,14 +1,13 @@
 %YAML 1.1
 ---
 Compadre:
-  'solution type': 'sine'
   'loop size': 1
   'io':
     # source file for coords and normal vectors
-    'input file prefix': '../test_data/grids/cube_with_normals_'
+    'input file prefix': '../test_data/grids/stokes_around_sphere_'
     'input file': ''
     # output file location
-    'output file prefix': '../test_data/amg_stokes_'
+    'output file prefix': '../test_data/stokes_around_sphere'
     # data reconstructed on target
     'output file': '.nc'
     # turn off mesh produced by vtk
@@ -26,9 +25,8 @@ Compadre:
     'number of batches': 1
   'neighborhood':
     'method': nanoflann
-    'search type': radius
-    'size': 1.4
-    'uniform radii': true
+    'search type': knn
+    'cutoff multiplier': 1.5
   'halo':
     'dynamic': true
     'multiplier': 12.0
