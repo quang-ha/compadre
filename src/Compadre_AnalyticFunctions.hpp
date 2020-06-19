@@ -520,11 +520,7 @@ class StokesPressureTest : public AnalyticFunction {
 
 	public :
 
-		virtual scalar_type evalScalar(const xyz_type& xIn, const local_index_type input_comp = 0) const;
-
-		virtual xyz_type evalScalarDerivative(const xyz_type& xIn, const local_index_type input_comp = 0) const;
-
-		virtual scalar_type evalScalarLaplacian(const xyz_type& xyzIn, const local_index_type input_comp = 0) const;
+		virtual scalar_type evalScalar(const xyz_type& xyzIn, const local_index_type input_comp = 0) const;
 
 };
 

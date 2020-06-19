@@ -834,16 +834,14 @@ xyz_type CurlCurlPolyTest::evalVector(const xyz_type& xyzIn) const {
 // StokesVelocityTest
 //
 
-xyz_type StokesVelocityTestRHS::evalVector(const xyz_type& xyzIn) const {
-    return xyz_type(32.0*tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z)*(1.0/(std::pow(cosh(4.0*xyzIn.y), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.z), 2))),
-                    32.0*tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.z)*(1.0/(std::pow(cosh(4.0*xyzIn.x), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.z), 2))),
-                    32.0*tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y)*(1.0/(std::pow(cosh(4.0*xyzIn.x), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.y), 2))));
-}
-
 xyz_type StokesVelocityTest::evalVector(const xyz_type& xyzIn) const {
-    return xyz_type(tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z),
-                    tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.z),
-                    tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y));
+    const double a = 1, W = 10, mu = 1;
+    const double x = xyzIn.x, y = xyzIn.y, z = xyzIn.z;
+    const double rsq = x*x + y*y + z*z;
+    return xyz_type(-1.0*(3.0*a*W*x*z*(-1.0 + rsq))/(4.0*std::pow(rsq, 5.0/2.0)),
+                    -1.0*(3.0*a*W*y*z*(-1.0 + rsq))/(4.0*std::pow(rsq, 5.0/2.0)),
+                    -1.0*W*( a*a*a*(x*x + y*y - 2.0*z*z) - 4.0*std::pow(rsq, 5.0/2.0) + 3.0*a*(x*x*x*x + y*y*y*y + 3.0*y*y*z*z + 2.0*z*z*z*z + x*x*(2.0*y*y + 3.0*z*z)) )/( 4.0*std::pow(rsq, 5.0/2.0) )
+                    );
 }
 
 //
@@ -851,17 +849,10 @@ xyz_type StokesVelocityTest::evalVector(const xyz_type& xyzIn) const {
 //
 
 scalar_type StokesPressureTest::evalScalar(const xyz_type& xyzIn, const local_index_type input_comp) const {
-    return tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z);
-}
-
-xyz_type StokesPressureTest::evalScalarDerivative(const xyz_type& xyzIn, const local_index_type input_comp) const {
-    return xyz_type((4.0/(std::pow(cosh(4.0*xyzIn.x), 2)))*tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z),
-                    tanh(4.0*xyzIn.x)*(4.0/(std::pow(cosh(4.0*xyzIn.y), 2)))*tanh(4.0*xyzIn.z),
-                    tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y)*(4.0/(std::pow(cosh(4.0*xyzIn.z), 2))));
-}
-
-scalar_type StokesPressureTest::evalScalarLaplacian(const xyz_type& xyzIn, const local_index_type input_comp) const {
-    return -32.0*tanh(4.0*xyzIn.x)*tanh(4.0*xyzIn.y)*tanh(4.0*xyzIn.z)*(1.0/(std::pow(cosh(4.0*xyzIn.x), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.y), 2)) + 1.0/(std::pow(cosh(4.0*xyzIn.z), 2)));
+    const double a = 1, W = 10, mu = 1;
+    const double x = xyzIn.x, y = xyzIn.y, z = xyzIn.z;
+    const double rsq = x*x + y*y + z*z;
+    return 10 - (3.0/2.0)*(mu*W*a*z)/(2.0*std::pow(rsq, 3.0/2.0));
 }
 
 }
