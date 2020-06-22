@@ -61,14 +61,14 @@ int main(int argc, char* args[]) {
         std::vector<double> velocity_errors(1);
         std::vector<double> pressure_errors(1);
         const std::string filename_prefix = parameters->get<Teuchos::ParameterList>("io").get<std::string>("input file prefix");
-        fnames[0] = filename_prefix + "24.nc";
-        hsize[0] = 24;
+        fnames[0] = filename_prefix + "0.4.nc";
+        hsize[0] = 0.4;
 
         TEUCHOS_TEST_FOR_EXCEPT_MSG(parameters->get<int>("loop size")>3, "Only three mesh levels available for this problem.");
 
         for (LO i=0; i<parameters->get<int>("loop size"); i++) {
             int Porder = parameters ->get<Teuchos::ParameterList>("remap").get<int>("porder");
-            double h_size = 2.0/hsize[i];
+            double h_size = hsize[i];
 
             std::string testfilename(fnames[i]);
 
@@ -254,15 +254,6 @@ int main(int argc, char* args[]) {
 
             TEUCHOS_TEST_FOR_EXCEPT_MSG(velocity_errors[i]!=velocity_errors[i], "NaN found in error norm.");
             TEUCHOS_TEST_FOR_EXCEPT_MSG(pressure_errors[i]!=pressure_errors[i], "NaN found in error norm.");
-            if ((parameters->get<std::string>("solution type")=="sine") || (parameters->get<std::string>("solution type")=="tanh"))  {
-                if (i>0) {
-                    TEUCHOS_TEST_FOR_EXCEPT_MSG(velocity_errors[i-1]/velocity_errors[i] < 3.5, std::string("Second order not achieved for sine solution of velocity (should be 4). Is: ") + std::to_string(velocity_errors[i-1]/velocity_errors[i]));
-                    TEUCHOS_TEST_FOR_EXCEPT_MSG(pressure_errors[i-1]/pressure_errors[i] < 3.5, std::string("Second order not achieved for sine solution of pressure (should be 4). Is: ") + std::to_string(pressure_errors[i-1]/pressure_errors[i]));
-                }
-            } else {
-                TEUCHOS_TEST_FOR_EXCEPT_MSG(velocity_errors[i] > 1e-8, "Second order solution not recovered exactly for velocity.");
-                TEUCHOS_TEST_FOR_EXCEPT_MSG(pressure_errors[i] > 1e-8, "Second order solution not recovered exactly for pressure.");
-            }
         }
     }
     Teuchos::TimeMonitor::summarize();
