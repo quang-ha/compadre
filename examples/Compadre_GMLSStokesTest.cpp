@@ -61,8 +61,9 @@ int main(int argc, char* args[]) {
         std::vector<double> velocity_errors(1);
         std::vector<double> pressure_errors(1);
         const std::string filename_prefix = parameters->get<Teuchos::ParameterList>("io").get<std::string>("input file prefix");
-        fnames[0] = filename_prefix + "0.4.nc";
-        hsize[0] = 0.4;
+        const std::string size = "0.2.nc";
+        hsize[0] = 0.2;
+        fnames[0] = filename_prefix + size;
 
         TEUCHOS_TEST_FOR_EXCEPT_MSG(parameters->get<int>("loop size")>3, "Only three mesh levels available for this problem.");
 
@@ -246,8 +247,7 @@ int main(int argc, char* args[]) {
             pressure_errors[i] = error_pressure_global_norm;
 
             WriteTime->start();
-            std::string output_filename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + std::to_string(i) /* loop */ + parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file");
-            std::string writetest_output_filename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + "writetest" + std::to_string(i) /* loop */ + parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file");
+            std::string output_filename = parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file prefix") + parameters->get<Teuchos::ParameterList>("io").get<std::string>("output file") + size;
             fm.setWriter(output_filename, particles);
             fm.write();
             WriteTime->stop();

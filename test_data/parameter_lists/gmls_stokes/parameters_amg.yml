@@ -17,7 +17,7 @@ Compadre:
     'file': '../test_data/parameter_lists/gmls_stokes/solver_amg.xml'
     'blocked': true
   'remap':
-    'weighting power': 4
+    'weighting power': 6
     'porder': 2
     'quadrature order': 2
     'quadrature dimension': 1
@@ -26,7 +26,7 @@ Compadre:
   'neighborhood':
     'method': nanoflann
     'search type': knn
-    'cutoff multiplier': 1.5
+    'cutoff multiplier': 1.2
   'halo':
     'dynamic': true
     'multiplier': 12.0
