@@ -7,9 +7,9 @@ Compadre:
     'input file prefix': '../test_data/grids/stokes_around_sphere_'
     'input file': ''
     # output file location
-    'output file prefix': '../test_data/stokes_around_sphere'
+    'output file prefix': '../test_data/stokes_around_sphere_results_'
     # data reconstructed on target
-    'output file': '.nc'
+    'output file': ''
     # turn off mesh produced by vtk
     'vtk produce mesh': false
   'solver':
