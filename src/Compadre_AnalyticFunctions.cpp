@@ -852,7 +852,7 @@ scalar_type StokesPressureTest::evalScalar(const xyz_type& xyzIn, const local_in
     const double a = 1, W = 10, mu = 1;
     const double x = xyzIn.x, y = xyzIn.y, z = xyzIn.z;
     const double rsq = x*x + y*y + z*z;
-    return 10 - (3.0/2.0)*(mu*W*a*z)/(2.0*std::pow(rsq, 3.0/2.0));
+    return 10 - (3.0/2.0)*((mu*W*a*z)/(std::pow(rsq, 3.0/2.0)));
 }
 
 }
