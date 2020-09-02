@@ -26,8 +26,7 @@ Compadre:
     'number of batches': 1
   'neighborhood':
     'method': nanoflann
-    'search type': radius
-    'size': 1.4
+    'cutoff multiplier': 1.2
     'uniform radii': true
   'halo':
     'dynamic': true
