@@ -61,12 +61,16 @@ int main(int argc, char* args[]) {
     }
 
     {
-        std::vector<std::string> fnames(1);
-        std::vector<double> hsize(1);
-        std::vector<double> errors(1);
+        std::vector<std::string> fnames(3);
+        std::vector<double> hsize(3);
+        std::vector<double> errors(3);
         const std::string filename_prefix = parameters->get<Teuchos::ParameterList>("io").get<std::string>("input file prefix");
-        fnames[0] = filename_prefix + "48.nc";
-        hsize[0] = 48;
+        fnames[0] = filename_prefix + "6.nc";
+        fnames[1] = filename_prefix + "12.nc";
+        fnames[2] = filename_prefix + "24.nc";
+        hsize[0] = 6;
+        hsize[1] = 12;
+        hsize[2] = 24;
 
         TEUCHOS_TEST_FOR_EXCEPT_MSG(parameters->get<int>("loop size")>3, "Only three mesh levels available for this problem.");
 

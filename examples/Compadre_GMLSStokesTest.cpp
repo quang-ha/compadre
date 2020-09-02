@@ -62,13 +62,17 @@ int main(int argc, char* args[]) {
     }
 
     {
-        std::vector<std::string> fnames(1);
-        std::vector<double> hsize(1);
-        std::vector<double> velocity_errors(1);
-        std::vector<double> pressure_errors(1);
+        std::vector<std::string> fnames(3);
+        std::vector<double> hsize(3);
+        std::vector<double> velocity_errors(3);
+        std::vector<double> pressure_errors(3);
         const std::string filename_prefix = parameters->get<Teuchos::ParameterList>("io").get<std::string>("input file prefix");
         fnames[0] = filename_prefix + "6.nc";
+        fnames[1] = filename_prefix + "12.nc";
+        fnames[2] = filename_prefix + "24.nc";
         hsize[0] = 6;
+        hsize[1] = 12;
+        hsize[2] = 24;
 
         TEUCHOS_TEST_FOR_EXCEPT_MSG(parameters->get<int>("loop size")>3, "Only three mesh levels available for this problem.");
 
@@ -107,8 +111,7 @@ int main(int argc, char* args[]) {
 
                 particles->createNeighborhood();
 
-                // LO neighbors_needed = Compadre::GMLS::getNP(Porder);
-                LO neighbors_needed = 27;
+                LO neighbors_needed = Compadre::GMLS::getNP(Porder);
 
                 particles->getNeighborhood()->constructAllNeighborLists(particles->getCoordsConst()->getHaloSize(),
                         parameters->get<Teuchos::ParameterList>("neighborhood").get<std::string>("search type"),
@@ -121,10 +124,12 @@ int main(int argc, char* args[]) {
 
                 auto max_h = particles->getNeighborhood()->computeMaxHSupportSize(true);
                 auto min_neighbors = particles->getNeighborhood()->computeMinNumNeighbors(true);
-                if (comm->getRank()==0) {
-                    std::cout << "max _h " << max_h << std::endl;
-                    std::cout << "min neighbors " << min_neighbors << std::endl;
-                }
+
+                // checking maximum radius and minimum neighbours
+                // if (comm->getRank()==0) {
+                //     std::cout << "max_h " << max_h << std::endl;
+                //     std::cout << "min neighbors " << min_neighbors << std::endl;
+                // }
 
                 // Iterative solver for the problem
                 Teuchos::RCP<Compadre::ProblemT> problem = Teuchos::rcp(new Compadre::ProblemT(particles));
@@ -153,18 +158,6 @@ int main(int argc, char* args[]) {
                 SolvingTime->start();
                 problem->solve();
                 SolvingTime->stop();
-
-                // // compute the residual
-                // Compadre::CurlCurlPolyTest v_function;
-                // Compadre::SecondOrderBasis p_function;
-                // particles->getFieldManager()->getFieldByName("velocity")->localInitFromVectorFunction(&v_function);
-                // particles->getFieldManager()->getFieldByName("pressure")->localInitFromScalarFunction(&p_function);
-                // auto lm_view = particles->getFieldManager()->getFieldByName("lm_pressure")->getMultiVectorPtr()->getLocalView<Compadre::host_view_type>();
-                // for (int jj=0; jj<lm_view.extent(0); ++jj) {
-                //     lm_view(jj,0) = 0.0;
-                // }
-                // particles->getFieldManager()->updateFieldsHaloData();
-                // problem->residual();
             }
 
             Teuchos::RCP<Compadre::AnalyticFunction> velocity_function, pressure_function;
